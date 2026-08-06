@@ -26,7 +26,7 @@ function App() {
       >
         <SimpleNavbar />
 
-        <main className="flex-1">
+        <main className="flex-1"> test
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
