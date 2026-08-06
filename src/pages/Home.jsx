@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import EcommerceCard from "../components/EcommerceCard";
 import { setProducts } from "../features/products/productSlice";
 import MasonryGridGallery from "../components/MasonryGridGallery";
 

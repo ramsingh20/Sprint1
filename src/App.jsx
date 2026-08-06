@@ -5,7 +5,6 @@ import Footer from "./components/Footer";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Products from "./pages/Products";
 import Home from "./pages/Home";
 
 function App() {
@@ -31,7 +30,6 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/products" element={<Products />} />
           </Routes>
         </main>
 
