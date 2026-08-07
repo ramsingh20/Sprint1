@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setProducts } from "../features/products/productSlice";
+import { useDispatch } from "react-redux";
 import MasonryGridGallery from "../components/MasonryGridGallery";
 
 export default function Home() {
   const dispatch = useDispatch();
-  const { products } = useSelector((state) => state.products);
+  // const { products } = useSelector((state) => state.products);
 
   // useEffect(() => {
   //   const fetchProducts = async () => {

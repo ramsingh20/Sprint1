@@ -1,16 +1,12 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 
-import SimpleNavbar from "./components/SimpleNavbar";
-import Footer from "./components/Footer";
-
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Home from "./pages/Home";
+import Router from "./app/router";
 
 function App() {
   return (
     <BrowserRouter>
-      <div
+      <Router />
+      {/* <div
         className="
           min-h-screen
           bg-gray-100
@@ -34,7 +30,7 @@ function App() {
         </main>
 
         <Footer />
-      </div>
+      </div> */}
     </BrowserRouter>
   );
 }
