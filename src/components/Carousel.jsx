@@ -1,3 +1,4 @@
+// For now I am unstalling swiper leater I will install 
 "use client";
 
 import "swiper/css";
@@ -10,11 +11,15 @@ import { IconButton } from "@material-tailwind/react";
 import { NavArrowRight, NavArrowLeft } from "iconoir-react";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 
+
+// For now I am unstalling swiper leater I will install 
 function CustomNavigation() {
   const swiper = useSwiper();
-
+// For now I am unstalling swiper leater I will install 
   return (
+    // For now I am unstalling swiper leater I will install 
     <>
+    
       <IconButton
         isCircular
         size="lg"

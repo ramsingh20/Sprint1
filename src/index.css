@@ -5,20 +5,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg: #ffffff;
-  --text: #111827;
-  --card: #f9fafb;
-  --border: #e5e7eb;
-}
-
-.dark {
-  --bg: #020617;
-  --text: #ffffff;
-  --card: #0f172a;
-  --border: #334155;
-}
-
 body {
   background-color: var(--bg);
   color: var(--text);
