@@ -9,7 +9,7 @@ const DashboardLayout = () => {
         <AppSidebar />
 
         <SidebarInset>
-            <main className="p-6">
+            <main className="min-h-svh bg-background text-foreground transition-colors duration-300">
                 <Outlet />
             </main>
         </SidebarInset>

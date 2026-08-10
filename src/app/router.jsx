@@ -4,6 +4,7 @@ import { Analytics } from '@/pages/Analytics'
 import Dashboard from '@/pages/Dashboard'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
+import NotFound from '@/pages/NotFound'
 import Profile from '@/pages/Profile'
 import Register from '@/pages/Register'
 import Reports from '@/pages/Reports'
@@ -26,12 +27,14 @@ const Router = () => {
         {/* Dashboard Layout */}
         <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
-            <Route path="products" element={<Analytics />} />
-            <Route path="orders" element={<Users />} />
-            <Route path="customers" element={<Reports />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="users" element={<Users />} />
+            <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="settings" element={<Profile />} />
+            <Route path="profile" element={<Profile />} />
         </Route>
+
+        <Route path='*' element={<NotFound />} />
 
     </Routes>
   )

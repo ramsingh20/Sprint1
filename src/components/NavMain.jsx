@@ -10,27 +10,27 @@ const sidebarData = [
   },
   {
     title: "Analytics",
-    url: "/analytics",
+    url: "/dashboard/analytics",
     icon: ChartColumn,
   },
   {
     title: "Users",
-    url: "/users",
+    url: "/dashboard/users",
     icon: Users,
   },
   {
     title: "Reports",
-    url: "/reports",
+    url: "/dashboard/reports",
     icon: ShoppingCart,
   },
   {
     title: "Settings",
-    url: "/settings",
+    url: "/dashboard/settings",
     icon: Settings,
   },
   {
     title: "Profile",
-    url: "/profile",
+    url: "/dashboard/profile",
     icon: PersonStanding,
   },
 ];
