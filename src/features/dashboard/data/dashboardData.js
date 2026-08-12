@@ -131,3 +131,45 @@ export const userGrowthData = [
     users: 2580,
   },
 ];
+export const activityData = [
+  {
+    id: "TXN-001",
+    customer: "Olivia Martin",
+    email: "olivia@example.com",
+    amount: "$1,999.00",
+    status: "Completed",
+    date: "Aug 12, 2026",
+  },
+  {
+    id: "TXN-002",
+    customer: "Jackson Lee",
+    email: "jackson@example.com",
+    amount: "$899.00",
+    status: "Pending",
+    date: "Aug 12, 2026",
+  },
+  {
+    id: "TXN-003",
+    customer: "Isabella Nguyen",
+    email: "isabella@example.com",
+    amount: "$1,249.00",
+    status: "Completed",
+    date: "Aug 11, 2026",
+  },
+  {
+    id: "TXN-004",
+    customer: "William Kim",
+    email: "william@example.com",
+    amount: "$499.00",
+    status: "Failed",
+    date: "Aug 11, 2026",
+  },
+  {
+    id: "TXN-005",
+    customer: "Sophia Brown",
+    email: "sophia@example.com",
+    amount: "$2,499.00",
+    status: "Completed",
+    date: "Aug 10, 2026",
+  },
+]
