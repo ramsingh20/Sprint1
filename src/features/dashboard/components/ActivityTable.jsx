@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Search, SlidersHorizontal } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Card, Typography } from "@material-tailwind/react";
 
@@ -12,15 +12,70 @@ const statusStyles = {
 const ActivityTable = ({ data }) => {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("All");
+    const [sortConfig, setSortConfig] = useState({ 
+        key: null, 
+        direction: "asc",
+    });
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5;
 
     const filteredData = useMemo(() => {
-        return data.filter((item) => {
+        const filtered = data.filter((item) => {
             const matchesSearch = item.id.toLowerCase().includes(search.toLowerCase()) || item.customer.toLowerCase().includes(search.toLowerCase()) || item.email.toLowerCase().includes(search.toLowerCase());
             const matchesStatus = status === "All" || item.status === status;
 
             return matchesSearch && matchesStatus;
         });
-    }, [data, search, status]);
+
+        if (!sortConfig.key) {
+            return filtered;
+        }
+
+        return [...filtered].sort((a, b) => {
+            const first = a[sortConfig.key];
+            const second = b[sortConfig.key];
+
+            if (sortConfig.key === "amount") {
+            const firstAmount = Number(
+                first.replace(/[$,]/g, "")
+            );
+            const secondAmount = Number(
+                second.replace(/[$,]/g, "")
+            );
+
+            return sortConfig.direction === "asc"
+                ? firstAmount - secondAmount
+                : secondAmount - firstAmount;
+            }
+
+            if (sortConfig.key === "date") {
+                const firstDate = new Date(first);
+                const secondDate = new Date(second);
+
+                return sortConfig.direction === "asc" ? firstDate - secondDate : secondDate - firstDate;
+            }
+
+            return sortConfig.direction === "asc" ? first.localeCompare(second) : second.localeCompare(first);
+        });
+    }, [data, search, status, sortConfig]);
+
+    const handleSort = (key) => {
+        setSortConfig((current) => {
+            if (current.key === key) {
+                return { key, direction: current.direction === "asc" ? "desc" : "asc", };
+            }
+            return { key, direction: "asc",};
+        });
+    };
+    const SortIcon = ({ column }) => {
+        if (sortConfig.key !== column) {
+            return <ArrowUpDown className="ml-1 h-3.5 w-3.5" />;
+        }
+
+        return sortConfig.direction === "asc" ? (<ArrowUp className="ml-1 h-3.5 w-3.5" />) : (<ArrowDown className="ml-1 h-3.5 w-3.5" />);
+    };
+
+    
   return (
     <Card className="overflow-hidden border border-border bg-card text-card-foreground shadow-sm">
         <div className="flex flex-col gap-4 p-6 lg:flex-row lg:items-center lg:justify-between">
@@ -64,11 +119,27 @@ const ActivityTable = ({ data }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Transaction</TableHead>
-              <TableHead>Customer</TableHead>
+              <TableHead>
+                <button type="button" onClick={() => handleSort("id")} className="inline-flex items-center font-medium hover:text-foreground">
+                    Transaction <SortIcon column="id" />
+                </button>
+              </TableHead>
+              <TableHead>
+                <button type="button" onClick={() => handleSort("customer")} className="inline-flex items-center font-medium hover:text-foreground">
+                    Customer<SortIcon column="customer" />
+                </button>
+              </TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+              <TableHead>
+                <button type="button" onClick={() => handleSort("date")} className="inline-flex items-center font-medium hover:text-foreground">
+                    Date<SortIcon column="date" />
+                </button>
+              </TableHead>
+              <TableHead className="text-right">
+                <button type="button" onClick={() => handleSort("amount")} className="ml-auto inline-flex items-center font-medium hover:text-foreground">
+                    Amount <SortIcon column="amount" />
+                </button>
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -105,9 +176,7 @@ const ActivityTable = ({ data }) => {
             {/* Handle empty results */}
             {filteredData.length === 0 && (
                 <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
-                    No transactions found.
-                    </TableCell>
+                    <TableCell colSpan={5} className="h-24 text-center">No transactions found.</TableCell>
                 </TableRow>
             )}
           </TableBody>
