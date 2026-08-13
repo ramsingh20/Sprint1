@@ -1,6 +1,6 @@
 import DashboardLayout from '@/layouts/DashboardLayout'
 import PublicLayout from '@/layouts/PublicLayout'
-import { Analytics } from '@/pages/Analytics'
+import  Analytics from '@/pages/Analytics'
 import Dashboard from '@/pages/Dashboard'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
