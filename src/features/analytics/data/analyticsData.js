@@ -29,16 +29,43 @@ export const analyticsKpiData = [
   },
 ];
 
-export const analyticsRevenueData = [
-  { month: "Jan", revenue: 182000 },
-  { month: "Feb", revenue: 195000 },
-  { month: "Mar", revenue: 208000 },
-  { month: "Apr", revenue: 221000 },
-  { month: "May", revenue: 248000 },
-  { month: "Jun", revenue: 262000 },
-  { month: "Jul", revenue: 274000 },
-  { month: "Aug", revenue: 284500 },
-];
+export const analyticsRevenueData = {
+  "7": [
+    { month: "Mon", revenue: 42000 },
+    { month: "Tue", revenue: 38500 },
+    { month: "Wed", revenue: 46800 },
+    { month: "Thu", revenue: 51200 },
+    { month: "Fri", revenue: 54900 },
+    { month: "Sat", revenue: 61800 },
+    { month: "Sun", revenue: 70400 },
+  ],
+
+  "30": [
+    { month: "Week 1", revenue: 182000 },
+    { month: "Week 2", revenue: 205000 },
+    { month: "Week 3", revenue: 238000 },
+    { month: "Week 4", revenue: 284500 },
+  ],
+
+  "90": [
+    { month: "Apr", revenue: 208000 },
+    { month: "May", revenue: 248000 },
+    { month: "Jun", revenue: 262000 },
+    { month: "Jul", revenue: 274000 },
+    { month: "Aug", revenue: 284500 },
+  ],
+
+  "365": [
+    { month: "Jan", revenue: 182000 },
+    { month: "Feb", revenue: 195000 },
+    { month: "Mar", revenue: 208000 },
+    { month: "Apr", revenue: 221000 },
+    { month: "May", revenue: 248000 },
+    { month: "Jun", revenue: 262000 },
+    { month: "Jul", revenue: 274000 },
+    { month: "Aug", revenue: 284500 },
+  ],
+};
 export const userAcquisitionData = {
   "7": [
     { label: "Mon", newUsers: 420, returningUsers: 180 },

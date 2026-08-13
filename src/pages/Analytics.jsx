@@ -2,10 +2,14 @@ import { CalendarDays } from "lucide-react";
 
 import PageHeader from "@/components/common/PageHeader";
 import AnalyticsKpiCard from "@/features/analytics/components/AnalyticsKpiCard";
-import { analyticsKpiData, analyticsRevenueData } from "@/features/analytics/data/analyticsData";
+import { analyticsKpiData, analyticsRevenueData, userAcquisitionData } from "@/features/analytics/data/analyticsData";
 import AnalyticsRevenueChart from "@/features/analytics/components/AnalyticsRevenueChart";
+import UserAcquisitionChart from "@/features/analytics/components/UserAcquisitionChart";
+import { useState } from "react";
 
 const Analytics = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState("30");
+
   return (
     <div className="space-y-6 p-6">
 
@@ -15,7 +19,11 @@ const Analytics = () => {
         <div className="flex items-center gap-2">
           <CalendarDays className="h-4 w-4 text-muted-foreground" />
 
-          <select className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20" defaultValue="30">
+          <select 
+            value={selectedPeriod}
+            onChange={(event) => setSelectedPeriod(event.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20"
+          >
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
             <option value="90">Last 90 days</option>
@@ -29,8 +37,9 @@ const Analytics = () => {
           <AnalyticsKpiCard key={item.title} {...item} />
         ))}
       </div>
-      <div>
-        <AnalyticsRevenueChart data={analyticsRevenueData} />
+      <div className="grid gap-6 lg:grid-cols-2">                                {/* <div className=""> */}
+        <AnalyticsRevenueChart data={analyticsRevenueData[selectedPeriod]} />
+        <UserAcquisitionChart data={userAcquisitionData[selectedPeriod]} />
       </div>
 
     </div>
