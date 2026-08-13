@@ -2,7 +2,8 @@ import { CalendarDays } from "lucide-react";
 
 import PageHeader from "@/components/common/PageHeader";
 import AnalyticsKpiCard from "@/features/analytics/components/AnalyticsKpiCard";
-import { analyticsKpiData } from "@/features/analytics/data/analyticsData";
+import { analyticsKpiData, analyticsRevenueData } from "@/features/analytics/data/analyticsData";
+import AnalyticsRevenueChart from "@/features/analytics/components/AnalyticsRevenueChart";
 
 const Analytics = () => {
   return (
@@ -28,7 +29,9 @@ const Analytics = () => {
           <AnalyticsKpiCard key={item.title} {...item} />
         ))}
       </div>
-
+      <div>
+        <AnalyticsRevenueChart data={analyticsRevenueData} />
+      </div>
 
     </div>
   );

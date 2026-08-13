@@ -28,3 +28,50 @@ export const analyticsKpiData = [
     description: "vs. previous period",
   },
 ];
+
+export const analyticsRevenueData = [
+  { month: "Jan", revenue: 182000 },
+  { month: "Feb", revenue: 195000 },
+  { month: "Mar", revenue: 208000 },
+  { month: "Apr", revenue: 221000 },
+  { month: "May", revenue: 248000 },
+  { month: "Jun", revenue: 262000 },
+  { month: "Jul", revenue: 274000 },
+  { month: "Aug", revenue: 284500 },
+];
+export const userAcquisitionData = {
+  "7": [
+    { label: "Mon", newUsers: 420, returningUsers: 180 },
+    { label: "Tue", newUsers: 510, returningUsers: 220 },
+    { label: "Wed", newUsers: 470, returningUsers: 250 },
+    { label: "Thu", newUsers: 590, returningUsers: 280 },
+    { label: "Fri", newUsers: 640, returningUsers: 310 },
+    { label: "Sat", newUsers: 520, returningUsers: 260 },
+    { label: "Sun", newUsers: 680, returningUsers: 340 },
+  ],
+
+  "30": [
+    { label: "Week 1", newUsers: 1680, returningUsers: 820 },
+    { label: "Week 2", newUsers: 1940, returningUsers: 960 },
+    { label: "Week 3", newUsers: 2210, returningUsers: 1080 },
+    { label: "Week 4", newUsers: 2590, returningUsers: 1240 },
+  ],
+
+  "90": [
+    { label: "Apr", newUsers: 6420, returningUsers: 3180 },
+    { label: "May", newUsers: 7180, returningUsers: 3520 },
+    { label: "Jun", newUsers: 7840, returningUsers: 3910 },
+    { label: "Jul", newUsers: 8420, returningUsers: 4210 },
+  ],
+
+  "365": [
+    { label: "Jan", newUsers: 18400, returningUsers: 9200 },
+    { label: "Feb", newUsers: 19200, returningUsers: 9700 },
+    { label: "Mar", newUsers: 20800, returningUsers: 10400 },
+    { label: "Apr", newUsers: 22100, returningUsers: 11100 },
+    { label: "May", newUsers: 23800, returningUsers: 11900 },
+    { label: "Jun", newUsers: 25400, returningUsers: 12700 },
+    { label: "Jul", newUsers: 27100, returningUsers: 13500 },
+    { label: "Aug", newUsers: 28900, returningUsers: 14200 },
+  ],
+};
