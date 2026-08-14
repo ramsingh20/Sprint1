@@ -15,10 +15,7 @@ const Dashboard = () => {
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statsData.map((stat) => (
-          <StatsCard
-            key={stat.title}
-            {...stat}
-          />
+          <StatsCard key={stat.title} {...stat} />
         ))}
       </div>
 
@@ -26,7 +23,6 @@ const Dashboard = () => {
       <div className="grid gap-6 lg:grid-cols-2">
 
         <RevenueChart data={revenueData} />
-
         <UserGrowthChart data={userGrowthData} />
 
       </div>

@@ -102,3 +102,32 @@ export const userAcquisitionData = {
     { label: "Aug", newUsers: 28900, returningUsers: 14200 },
   ],
 };
+export const trafficSourceData = {
+  "7": [
+    { name: "Organic Search", value: 42 },
+    { name: "Direct", value: 27 },
+    { name: "Social Media", value: 18 },
+    { name: "Referral", value: 13 },
+  ],
+
+  "30": [
+    { name: "Organic Search", value: 42 },
+    { name: "Direct", value: 27 },
+    { name: "Social Media", value: 18 },
+    { name: "Referral", value: 13 },
+  ],
+
+  "90": [
+    { name: "Organic Search", value: 45 },
+    { name: "Direct", value: 25 },
+    { name: "Social Media", value: 17 },
+    { name: "Referral", value: 13 },
+  ],
+
+  "365": [
+    { name: "Organic Search", value: 48 },
+    { name: "Direct", value: 24 },
+    { name: "Social Media", value: 16 },
+    { name: "Referral", value: 12 },
+  ],
+};
