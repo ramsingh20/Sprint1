@@ -1,4 +1,5 @@
 import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "sonner";
 
 import Router from "./app/router";
 
@@ -31,6 +32,7 @@ function App() {
 
         <Footer />
       </div> */}
+      <Toaster position="top-center" richColors />
     </BrowserRouter>
   );
 }
