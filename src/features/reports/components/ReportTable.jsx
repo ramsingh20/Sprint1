@@ -1,36 +1,27 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import { Card, Typography } from "@material-tailwind/react";
 const ITEMS_PER_PAGE = 6;
 
-const ReportTable = ({ data }) => {
-  const [search, setSearch] = useState("");
+const ReportTable = ({ data, search, onSearchChange }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredData = useMemo(() => {
-    return data.filter((item) =>
-      item.id.toLowerCase().includes(search.toLowerCase()) || item.date.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [data, search]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data]);
 
-  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
-
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
-    return filteredData.slice( startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredData, currentPage]);
+    return data.slice( startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [data, currentPage]);
 
   const formatCurrency = (value) => {return `$${value.toLocaleString()}`;};
 
   const getAverageOrderValue = (item) => {
     return item.orders > 0 ? item.revenue / item.orders : 0;
-  };
-
-  const handleSearch = (event) => {
-    setSearch(event.target.value);
-    setCurrentPage(1);
   };
 
   return (
@@ -50,7 +41,7 @@ const ReportTable = ({ data }) => {
             type="text"
             placeholder="Search reports..."
             value={search}
-            onChange={handleSearch}
+            onChange={(event) => onSearchChange(event.target.value)}
             className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 sm:w-64"
           />
         </div>
@@ -96,7 +87,7 @@ const ReportTable = ({ data }) => {
       </div>
       <div className="flex flex-col gap-3 border-t border-border px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
         <Typography variant="small" className="font-normal text-muted-foreground">
-          Showing{" "} {paginatedData.length} of{" "} {filteredData.length} reports
+          Showing{" "} {paginatedData.length} of{" "} {data.length} reports
         </Typography>
 
         <div className="flex items-center gap-2">
