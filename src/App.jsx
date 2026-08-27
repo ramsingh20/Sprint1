@@ -5,7 +5,7 @@ import Router from "./app/router";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/Sprint1">
       <Router />
       {/* <div
         className="
