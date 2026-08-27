@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/Sprint1/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulseBoard – Enterprise Real-Time Analytics Dashboard</title>
+    <script>
+      (function () {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/Sprint1/assets/index-Bdf_ss3P.js"></script>
+    <link rel="stylesheet" crossorigin href="/Sprint1/assets/index-BdkbJqmK.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
