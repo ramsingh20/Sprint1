@@ -1,45 +1,52 @@
-import { createContext, useContext, useEffect, useState } from "react";
-
-const ThemeContext = createContext();
+import { createContext, useContext, useEffect, useState, } from "react";
+const ThemeContext = createContext(null);
 
 export const ThemeProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [theme, setTheme] = useState(() => {return localStorage.getItem("theme") || "system"});
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
+    const root = document.documentElement;
 
-    if (savedTheme) {
-      setDarkMode(savedTheme === "dark");
-    } else {
-      const systemTheme = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
+    const applyTheme = (currentTheme) => {
+      const isDark = currentTheme === "dark" ||
+        (currentTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      root.classList.toggle("dark", isDark);
+    };
 
-      setDarkMode(systemTheme);
-    }
-  }, []);
+    applyTheme(theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   useEffect(() => {
-    const html = document.documentElement;
+    if (theme !== "system") return;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    if (darkMode) {
-      html.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      html.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
+    const handleChange = () => {
+      document.documentElement.classList.toggle("dark", mediaQuery.matches);
+    };
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => { mediaQuery.removeEventListener("change", handleChange)};
+  }, [theme]);
 
   const toggleTheme = () => {
-    setDarkMode((prev) => !prev);
+    setTheme((currentTheme) => currentTheme === "dark" ? "light" : "dark");
   };
 
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, darkMode: isDark,}}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used inside ThemeProvider");
+  }
+
+  return context;
+};

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { RotateCcw, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import AppearanceSettings from "@/features/settings/components/AppearanceSettings";
 
 const generalSettingsSchema = z.object({
   workspaceName: z
