@@ -4,6 +4,7 @@ import SettingsSidebar from "@/features/settings/components/SettingsSidebar";
 import GeneralSettings from "@/features/settings/components/GeneralSettings";
 import AppearanceSettings from "@/features/settings/components/AppearanceSettings";
 import NotificationSettings from "@/features/settings/components/NotificationSettings";
+import SecuritySettings from "@/features/settings/components/SecuritySettings";
 
 const Settings = () => {
   const [activeSection, setActiveSection] = useState("general");
@@ -21,11 +22,7 @@ const Settings = () => {
           {activeSection === "general" && (<GeneralSettings />)}
           {activeSection === "appearance" && (<AppearanceSettings />)}
           {activeSection === "notifications" && (<NotificationSettings />)}
-          {!["general", "appearance", "notifications",].includes(activeSection) && (
-            <div className="flex min-h-[300px] items-center justify-center">
-              <p className="text-sm text-muted-foreground">Security settings coming next.</p>
-            </div>
-          )}
+          {activeSection === "security" && (<SecuritySettings />)}
         </section>
       </div>
     </div>
@@ -33,3 +30,14 @@ const Settings = () => {
 };
 
 export default Settings;
+
+
+
+
+
+
+// {!["general", "appearance", "notifications",].includes(activeSection) && (
+//   <div className="flex min-h-[300px] items-center justify-center">
+//     <p className="text-sm text-muted-foreground">Security settings coming next.</p>
+//   </div>
+// )}
