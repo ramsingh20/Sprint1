@@ -38,9 +38,9 @@ export default function Register() {
 
       dispatch(setUser(data.newUser));
 
-      localStorage.setItem("userInfo", JSON.stringify(data.newUser));
+      // localStorage.setItem("userInfo", JSON.stringify(data.newUser));
 
-      navigate("/"); // Redirect after home
+      navigate("/dashboard");
     } catch (error) {
       console.log(error);
     }

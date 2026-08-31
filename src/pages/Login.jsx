@@ -42,9 +42,9 @@ export default function Login() {
             // console.log("data user.name", data.user.name);
             
             dispatch(setUser(data.Ruser))
-            navigate('/')
+            navigate('/dashboard')
 
-            localStorage.setItem("userInfo", JSON.stringify(data.Ruser))
+            // localStorage.setItem("userInfo", JSON.stringify(data.Ruser))
 
             // <Navigate to={'/'} />
         } catch (error) {
