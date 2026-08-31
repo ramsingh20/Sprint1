@@ -1,7 +1,7 @@
 // src/pages/Login.jsx
 import React, { useState } from "react";
 import { Input, Button, Typography, Card } from "@material-tailwind/react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { setUser } from "../features/auth/authSlice";
 import { useDispatch } from "react-redux";
 
@@ -11,6 +11,8 @@ export default function Login() {
   
   const navigate = useNavigate();
   const dispatch = useDispatch()
+
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +44,9 @@ export default function Login() {
             // console.log("data user.name", data.user.name);
             
             dispatch(setUser(data.Ruser))
-            navigate('/dashboard')
+            // navigate('/dashboard')
+            const from = location.state?.from?.pathname || "/dashboard";
+            navigate(from, { replace: true });
 
             // localStorage.setItem("userInfo", JSON.stringify(data.Ruser))
 
