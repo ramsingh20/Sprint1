@@ -1,4 +1,5 @@
 import ProtectedRoute from '@/features/auth/components/ProtectedRoute'
+import RoleProtectedRoute from '@/features/auth/components/RoleProtectedRoute'
 import DashboardLayout from '@/layouts/DashboardLayout'
 import PublicLayout from '@/layouts/PublicLayout'
 import  Analytics from '@/pages/Analytics'
@@ -29,10 +30,19 @@ const Router = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="users" element={<Users />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="settings" element={<Settings />} />
+              <Route element={<RoleProtectedRoute allowedRoles={["Admin", "Manager"]} />}>
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="reports" element={<Reports />} />
+              </Route>
+
+              <Route element={<RoleProtectedRoute allowedRoles={["Admin"]} />}>
+                <Route path="users" element={<Users />} />
+              </Route>
+
+              <Route element={<RoleProtectedRoute allowedRoles={["Admin", "Manager"]}/>}>
+                <Route path="settings" element={<Settings />} />
+              </Route>
+              
               <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
