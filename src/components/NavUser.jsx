@@ -1,4 +1,4 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { LogOut, Settings, ChevronRight } from "lucide-react";
 import { logout } from "@/features/auth/authSlice";
@@ -12,6 +12,8 @@ const NavUser = () => {
     navigate("/login", { replace: true });
   };
 
+  const userInfo = useSelector((state) => state.auth.userInfo);
+
   return (
     <div className="border-t bg-background/50 p-3">
       <div className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-muted/60">
@@ -24,8 +26,8 @@ const NavUser = () => {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">Ram Singh</p>
-          <p className="truncate text-xs text-muted-foreground">Administrator</p>
+          <p className="truncate text-sm font-semibold">{userInfo?.name || "User"}</p>
+          <p className="truncate text-xs text-muted-foreground">{userInfo?.role || "User"}</p>
         </div>
 
         <ChevronRight className="size-4 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />

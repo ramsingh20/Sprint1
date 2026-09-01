@@ -40,7 +40,7 @@ export default function Login() {
             const data = await response.json()
 
             console.log("data", data);
-            console.log("data user", data.Ruser);
+            console.log("data Ruser", data.Ruser);
             // console.log("data user.name", data.user.name);
             
             dispatch(setUser(data.Ruser))
