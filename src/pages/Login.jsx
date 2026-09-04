@@ -42,10 +42,14 @@ export default function Login() {
             console.log("data", data);
             console.log("data Ruser", data.Ruser);
             // console.log("data user.name", data.user.name);
+            // if (!response.ok) {
+            //   throw new Error(data.message || "Login failed");
+            // }
+            localStorage.setItem("token", data.token);      // Store JWT
             
-            dispatch(setUser(data.Ruser))
+            dispatch(setUser(data.Ruser))   // Store user information
             // navigate('/dashboard')
-            const from = location.state?.from?.pathname || "/dashboard";
+            const from = location.state?.from?.pathname || "/dashboard";    // Redirect user
             navigate(from, { replace: true });
 
             // localStorage.setItem("userInfo", JSON.stringify(data.Ruser))
