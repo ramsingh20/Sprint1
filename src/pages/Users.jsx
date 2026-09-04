@@ -1,18 +1,39 @@
 import PageHeader from "@/components/common/PageHeader";
 import UserDetailsDialog from "@/features/users/components/UserDetailsDialog";
 import UsersTable from "@/features/users/components/UsersTable";
-import { usersData } from "@/features/users/data/usersData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditUserDialog from "@/features/users/components/EditUserDialog";
 import { toast } from "sonner";
 import DeleteUserDialog from "@/features/users/components/DeleteUserDialog";
+import { getUsers } from "@/services/userService";
 
 const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [users, setUsers] = useState(usersData);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const data = await getUsers();
+
+        setUsers(data);
+      } catch (error) {
+        console.error("Failed to load users:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
   
 
   const handleViewUser = (user) => {
@@ -66,6 +87,21 @@ const Users = () => {
 
     toast.success(`${user.name} has been activated.`);
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[300px] items-center justify-center">
+        <p className="text-sm text-muted-foreground">Loading users...</p>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex min-h-[300px] items-center justify-center">
+        <p className="text-sm text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-6">
