@@ -22,3 +22,22 @@ export const getUsers = async () => {
 
   return data.users;
 };
+
+export const getUserById = async (id) => {
+  const token = getToken();
+
+  const response = await fetch(`${API_URL}/users/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch user");
+  }
+
+  return data.user;
+};

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import EditUserDialog from "@/features/users/components/EditUserDialog";
 import { toast } from "sonner";
 import DeleteUserDialog from "@/features/users/components/DeleteUserDialog";
-import { getUsers } from "@/services/userService";
+import { getUserById, getUsers } from "@/services/userService";
 
 const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -36,9 +36,17 @@ const Users = () => {
   }, []);
   
 
-  const handleViewUser = (user) => {
-    setSelectedUser(user);
-    setIsDetailsOpen(true);
+  const handleViewUser = async (user) => {
+    try {
+      const userDetails = await getUserById(user._id);
+
+      setSelectedUser(userDetails);
+      setIsDetailsOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
+
+      toast.error(error.message || "Failed to fetch user details");
+    }
   };
 
   const handleEditUser = (user) => {
