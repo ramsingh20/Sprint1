@@ -14,8 +14,8 @@ const editUserSchema = z.object({
     .string()
     .email("Please enter a valid email address."),
 
-  role: z.enum(["Admin", "Manager", "Customer"]),
-  status: z.enum(["Active", "Pending", "Inactive"]),
+  role: z.enum(["Admin", "Manager", "User"]),
+  status: z.enum(["Active", "Inactive"]),
 });
 
 const EditUserDialog = ({ user, open, onOpenChange, onSave, }) => {
@@ -79,7 +79,7 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave, }) => {
             >
               <option value="Admin">Admin</option>
               <option value="Manager">Manager</option>
-              <option value="Customer">Customer</option>
+              <option value="User">User</option>
             </select>
 
             {errors.role && (<p className="text-sm text-destructive">{errors.role.message}</p>)}
@@ -93,7 +93,6 @@ const EditUserDialog = ({ user, open, onOpenChange, onSave, }) => {
               className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
             >
               <option value="Active">Active</option>
-              <option value="Pending">Pending</option>
               <option value="Inactive">Inactive</option>
             </select>
 

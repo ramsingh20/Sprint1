@@ -40,7 +40,7 @@ const UserDetailsDialog = ({user,open,onOpenChange,}) => {
         <div className="rounded-lg border border-border">
           <div className="grid grid-cols-2 border-b border-border px-4 py-3">
             <span className="text-sm text-muted-foreground">User ID</span>
-            <span className="text-right text-sm font-medium">{user.id}</span>
+            <span className="text-right text-sm font-medium">{user._id}</span>
           </div>
 
           <div className="grid grid-cols-2 border-b border-border px-4 py-3">

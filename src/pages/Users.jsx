@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import EditUserDialog from "@/features/users/components/EditUserDialog";
 import { toast } from "sonner";
 import DeleteUserDialog from "@/features/users/components/DeleteUserDialog";
-import { getUserById, getUsers } from "@/services/userService";
+import { getUserById, getUsers, updateUser } from "@/services/userService";
 
 const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -53,14 +53,25 @@ const Users = () => {
     setSelectedUser(user);
     setIsEditOpen(true);
   };
-  const handleSaveUser = (updatedUser) => {
-    setUsers((currentUsers) =>
-      currentUsers.map((user) => user.id === updatedUser.id ? updatedUser : user)
-    );
-    setSelectedUser(updatedUser);
-    setIsEditOpen(false);
+  const handleSaveUser = async (updatedUser) => {
+    try {
+      const updatedUserData = await updateUser(updatedUser._id, {
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      });
 
-    toast.success("User updated successfully.");
+      setUsers((currentUsers) =>
+        currentUsers.map((user) => user.id === updatedUserData.id ? updatedUserData : user)
+      );
+
+      setSelectedUser(updatedUserData);
+      setIsEditOpen(false);
+      toast.success("User updated successfully.");
+    } catch (error) {
+      console.error("Failed to update user:", error);
+      toast.error(error.message || "Failed to update user");
+    }
   };
 
   const handleDeleteUser = (user) => {

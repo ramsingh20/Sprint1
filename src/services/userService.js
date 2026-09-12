@@ -41,3 +41,23 @@ export const getUserById = async (id) => {
 
   return data.user;
 };
+export const updateUser = async (id, userData) => {
+  const token = getToken();
+
+  const response = await fetch(`${API_URL}/users/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update user");
+  }
+
+  return data.user;
+};
