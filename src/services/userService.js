@@ -61,3 +61,18 @@ export const updateUser = async (id, userData) => {
 
   return data.user;
 };
+export const deleteUser = async (id) => {
+  const token = getToken();
+  const response = await fetch(`${API_URL}/users/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to delete user");
+  }
+  return data;
+};

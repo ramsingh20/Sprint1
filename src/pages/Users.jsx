@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import EditUserDialog from "@/features/users/components/EditUserDialog";
 import { toast } from "sonner";
 import DeleteUserDialog from "@/features/users/components/DeleteUserDialog";
-import { getUserById, getUsers, updateUser } from "@/services/userService";
+import { deleteUser, getUserById, getUsers, updateUser } from "@/services/userService";
 
 const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -60,7 +60,7 @@ const Users = () => {
         email: updatedUser.email,
         role: updatedUser.role,
       });
-
+// user._id
       setUsers((currentUsers) =>
         currentUsers.map((user) => user.id === updatedUserData.id ? updatedUserData : user)
       );
@@ -79,15 +79,23 @@ const Users = () => {
     setIsDeleteOpen(true);
   };
 
-  const handleConfirmDelete = (user) => {
-    setUsers((currentUsers) => currentUsers.filter((currentUser) => currentUser.id !== user.id));
-
+const handleConfirmDelete = async (user) => {
+  try {
+    await deleteUser(user._id);
+    setUsers((currentUsers) =>
+      currentUsers.filter((currentUser) => currentUser._id !== user._id)
+    );
     setIsDeleteOpen(false);
     setSelectedUser(null);
 
     toast.success("User deleted successfully.");
-  };
+  } catch (error) {
+    console.error("Failed to delete user:", error);
+    toast.error(error.message || "Failed to delete user");
+  }
+};
 
+// ._id
   const handleDeactivateUser = (user) => {
     setUsers((currentUsers) =>
       currentUsers.map((currentUser) =>
