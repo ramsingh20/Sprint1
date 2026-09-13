@@ -95,24 +95,35 @@ const handleConfirmDelete = async (user) => {
   }
 };
 
-// ._id
-  const handleDeactivateUser = (user) => {
-    setUsers((currentUsers) =>
-      currentUsers.map((currentUser) =>
-        currentUser.id === user.id ? {...currentUser,status: "Inactive",} : currentUser
-      )
-    );
-    toast.success(`${user.name} has been deactivated.`);
+  const handleDeactivateUser = async (user) => {
+    try {
+      const response = await updateUserStatus(user._id, "Inactive");
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser._id === user._id ? {...currentUser, status: response.user.status,} : currentUser
+        )
+      );
+      toast.success(`${user.name} has been deactivated.`);
+    } catch (error) {
+      console.error("Failed to deactivate user:", error);
+      toast.error(error.message || "Failed to deactivate user");
+    }
   };
 
-  const handleActivateUser = (user) => {
-    setUsers((currentUsers) =>
-      currentUsers.map((currentUser) =>
-        currentUser.id === user.id ? {...currentUser, status: "Active",} : currentUser
-      )
-    );
+  const handleActivateUser = async (user) => {
+    try {
+      const response = await updateUserStatus(user._id, "Active");
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser._id === user._id ? {...currentUser, status: response.user.status,} : currentUser
+        )
+      );
 
-    toast.success(`${user.name} has been activated.`);
+      toast.success(`${user.name} has been activated.`);
+    } catch (error) {
+      console.error("Failed to activate user:", error);
+      toast.error(error.message || "Failed to activate user");
+    }
   };
 
   if (loading) {

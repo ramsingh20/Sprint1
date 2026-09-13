@@ -69,10 +69,26 @@ export const deleteUser = async (id) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  
+
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.message || "Failed to delete user");
+  }
+  return data;
+};
+export const updateUserStatus = async (id, status) => {
+  const token = getToken();
+  const response = await fetch(`${API_URL}/users/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update user status");
   }
   return data;
 };

@@ -131,7 +131,6 @@ const UsersTable = ({ data, onViewUser, onEditUser, onDeleteUser, onDeactivateUs
                 >
                     <option value="All">All Status</option>
                     <option value="Active">Active</option>
-                    <option value="Pending">Pending</option>
                     <option value="Inactive">Inactive</option>
                 </select>
 
@@ -143,7 +142,7 @@ const UsersTable = ({ data, onViewUser, onEditUser, onDeleteUser, onDeactivateUs
                     <option value="All">All Roles</option>
                     <option value="Admin">Admin</option>
                     <option value="Manager">Manager</option>
-                    <option value="Customer">Customer</option>
+                    <option value="User">User</option>
                 </select>
                 </div>
             </div>
@@ -169,7 +168,7 @@ const UsersTable = ({ data, onViewUser, onEditUser, onDeleteUser, onDeactivateUs
 
                 <TableBody>
                     {paginatedUsers.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow key={user._id}>
                         <TableCell>
                         <div className="flex items-center gap-3">
                             <Avatar>
