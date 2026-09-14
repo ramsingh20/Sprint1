@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import EditUserDialog from "@/features/users/components/EditUserDialog";
 import { toast } from "sonner";
 import DeleteUserDialog from "@/features/users/components/DeleteUserDialog";
-import { deleteUser, getUserById, getUsers, updateUser } from "@/services/userService";
+import { deleteUser, getUserById, getUsers, updateUser, updateUserStatus } from "@/services/userService";
 
 const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
