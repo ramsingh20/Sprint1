@@ -62,3 +62,34 @@ export const updateCurrentUser = async (userData) => {
 
   return data.user;
 };
+
+export const changePassword = async ({
+  currentPassword,
+  newPassword,
+}) => {
+  const token = getToken();
+
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+
+  const response = await fetch(`${API_URL}/auth/change-password`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      currentPassword,
+      newPassword,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to change password");
+  }
+
+  return data;
+};
