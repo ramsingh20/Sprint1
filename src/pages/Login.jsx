@@ -42,9 +42,9 @@ export default function Login() {
             console.log("data", data);
             console.log("data Ruser", data.Ruser);
             // console.log("data user.name", data.user.name);
-            // if (!response.ok) {
-            //   throw new Error(data.message || "Login failed");
-            // }
+            if (!response.ok) {
+              throw new Error(data.message || "Login failed");
+            }
             localStorage.setItem("token", data.token);      // Store JWT
             
             dispatch(setUser(data.Ruser))   // Store user information
