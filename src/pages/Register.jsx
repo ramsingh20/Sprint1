@@ -35,8 +35,10 @@ export default function Register() {
       );
 
       const data = await response.json();
+      console.log("data", data);
+      console.log("data user", data.user);    // chatGPT was right
 
-      dispatch(setUser(data.newUser));
+      dispatch(setUser(data.user));
 
       // localStorage.setItem("userInfo", JSON.stringify(data.newUser));
 
