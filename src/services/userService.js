@@ -1,94 +1,41 @@
-const API_URL = "http://localhost:3000/api";
-
-const getToken = () => {
-  return localStorage.getItem("token");
-};
+import { apiRequest } from "@/services/api";
 
 export const getUsers = async () => {
-  const token = getToken();
-
-  const response = await fetch(`${API_URL}/users`, {
+  const data = await apiRequest("/users", {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to fetch users");
-  }
 
   return data.users;
 };
 
 export const getUserById = async (id) => {
-  const token = getToken();
-
-  const response = await fetch(`${API_URL}/users/${id}`, {
+  const data = await apiRequest(`/users/${id}`, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to fetch user");
-  }
 
   return data.user;
 };
-export const updateUser = async (id, userData) => {
-  const token = getToken();
 
-  const response = await fetch(`${API_URL}/users/${id}`, {
+export const updateUser = async (id, userData) => {
+  const data = await apiRequest(`/users/${id}`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
     body: JSON.stringify(userData),
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to update user");
-  }
-
   return data.user;
 };
-export const deleteUser = async (id) => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/users/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
 
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to delete user");
-  }
-  return data;
-};
-export const updateUserStatus = async (id, status) => {
-  const token = getToken();
-  const response = await fetch(`${API_URL}/users/${id}/status`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ status }),
+export const deleteUser = async (id) => {
+  return apiRequest(`/users/${id}`, {
+    method: "DELETE",
   });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to update user status");
-  }
-  return data;
+};
+
+export const updateUserStatus = async (id, status) => {
+  return apiRequest(`/users/${id}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      status,
+    }),
+  });
 };

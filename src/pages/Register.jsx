@@ -38,6 +38,11 @@ export default function Register() {
       console.log("data", data);
       console.log("data user", data.user);    // chatGPT was right
 
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+      localStorage.setItem("token", data.token);
+
       dispatch(setUser(data.user));
 
       // localStorage.setItem("userInfo", JSON.stringify(data.newUser));
