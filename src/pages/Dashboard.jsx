@@ -5,8 +5,33 @@ import StatsCard from "@/features/dashboard/components/StatsCard";
 import UserGrowthChart from "@/features/dashboard/components/UserGrowthChart";
 
 import { activityData, revenueData, statsData, userGrowthData, } from "@/features/dashboard/data/dashboardData";
+import { getDashboardStats } from "@/services/dashboardService";
+import { useEffect, useState } from "react";
 
 const Dashboard = () => {
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadDashboardStats = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const data = await getDashboardStats();
+        setDashboardStats(data);
+
+      } catch (error) {
+        console.error("Failed to load dashboard stats:", error);
+        setError(error.message || "Failed to load dashboard statistics");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardStats();
+  }, []);
+  
   return (
     <div className="space-y-6 p-6">
 
