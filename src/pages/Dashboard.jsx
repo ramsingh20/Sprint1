@@ -4,8 +4,8 @@ import RevenueChart from "@/features/dashboard/components/RevenueChart";
 import StatsCard from "@/features/dashboard/components/StatsCard";
 import UserGrowthChart from "@/features/dashboard/components/UserGrowthChart";
 
-import { activityData, statsData, userGrowthData, } from "@/features/dashboard/data/dashboardData";
-import { getDashboardStats, getRevenueData } from "@/services/dashboardService";
+import { activityData, statsData, } from "@/features/dashboard/data/dashboardData";
+import { getDashboardStats, getRevenueData, getUserGrowthData } from "@/services/dashboardService";
 import { useEffect, useState } from "react";
 
 const Dashboard = () => {
@@ -17,26 +17,35 @@ const Dashboard = () => {
   const [revenueLoading, setRevenueLoading] = useState(true);
   const [revenueError, setRevenueError] = useState("");
 
+  const [userGrowthData, setUserGrowthData] = useState([]);
+  const [userGrowthLoading, setUserGrowthLoading] = useState(true);
+  const [userGrowthError, setUserGrowthError] = useState("");
+
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
         setLoading(true);
         setRevenueLoading(true);
+        setUserGrowthLoading(true);
 
         setError("");
         setRevenueError("");
-        const [stats, revenue] = await Promise.all([getDashboardStats(), getRevenueData(),]);
+        setUserGrowthError("");
+        const [stats, revenue, userGrowth] = await Promise.all([getDashboardStats(), getRevenueData(), getUserGrowthData(),]);
 
         setDashboardStats(stats);
         setRevenueData(revenue);
+        setUserGrowthData(userGrowth);
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
         setError(error.message || "Failed to load dashboard data");
         setRevenueError(error.message || "Failed to load revenue data");
+        setUserGrowthError(error.message || "Failed to load user growth data");
 
       } finally {
         setLoading(false);
         setRevenueLoading(false);
+        setUserGrowthLoading(false);
       }
     };
 
@@ -94,7 +103,17 @@ const Dashboard = () => {
           ) : (<RevenueChart data={revenueData} />)
         }
         
-        <UserGrowthChart data={userGrowthData} />
+        {
+          userGrowthLoading ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
+              <p className="text-sm text-muted-foreground">Loading user growth data...</p>
+            </div>
+          ) : userGrowthError ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
+              <p className="text-sm text-destructive">{userGrowthError}</p>
+            </div>
+          ) : (<UserGrowthChart data={userGrowthData} />)
+        }
 
       </div>
 

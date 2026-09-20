@@ -15,3 +15,10 @@ export const getRevenueData = async () => {
 
   return data.revenue;
 };
+export const getUserGrowthData = async () => {
+  const data = await apiRequest("/dashboard/user-growth", {
+    method: "GET",
+  });
+
+  return data.userGrowth;
+};

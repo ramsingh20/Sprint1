@@ -1,24 +1,12 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, } from "recharts";
-
 import { Card, Typography } from "@material-tailwind/react";
 
 const UserGrowthChart = ({ data }) => {
   return (
     <Card className="border border-border bg-card p-6 text-card-foreground shadow-sm">
       <div className="mb-6">
-        <Typography
-          variant="h6"
-          className="font-semibold"
-        >
-          User Growth
-        </Typography>
-
-        <Typography
-          variant="small"
-          className="mt-1 font-normal text-muted-foreground"
-        >
-          Monthly growth in registered users.
-        </Typography>
+        <Typography variant="h6" className="font-semibold">User Growth</Typography>
+        <Typography variant="small" className="mt-1 font-normal text-muted-foreground">Monthly growth in registered users.</Typography>
       </div>
 
       <div className="h-[350px] w-full">
@@ -32,29 +20,13 @@ const UserGrowthChart = ({ data }) => {
               bottom: 0,
             }}
           >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-            />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
-            <XAxis
-              dataKey="month"
-              axisLine={false}
-              tickLine={false}
-              tickMargin={10}
-            />
-
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tickMargin={10}
-            />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tickMargin={10} />
+            <YAxis axisLine={false} tickLine={false} tickMargin={10} />
 
             <Tooltip
-              formatter={(value) => [
-                value.toLocaleString(),
-                "Users",
-              ]}
+              formatter={(value) => [value.toLocaleString(), "Users",]}
             />
 
             <Line
@@ -63,9 +35,7 @@ const UserGrowthChart = ({ data }) => {
               stroke="currentColor"
               strokeWidth={2}
               dot={false}
-              activeDot={{
-                r: 5,
-              }}
+              activeDot={{r: 5,}}
             />
           </LineChart>
         </ResponsiveContainer>
