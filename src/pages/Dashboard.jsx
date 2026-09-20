@@ -36,12 +36,36 @@ const Dashboard = () => {
     <div className="space-y-6 p-6">
 
       <PageHeader title="Dashboard" description="Overview of your business performance." />
-
+      
+      {error && (
+        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
+          {error}
+        </div>
+      )}
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {statsData.map((stat) => (
-          <StatsCard key={stat.title} {...stat} />
-        ))}
+        {statsData.map((stat) => {
+          let value = 0;
+
+          if (stat.title === "Total Revenue") {
+            value = dashboardStats?.totalRevenue ?? 0;
+          }
+          if (stat.title === "Active Users") {
+            value = dashboardStats?.activeUsers ?? 0;
+          }
+          if (stat.title === "Total Orders") {
+            value = dashboardStats?.totalOrders ?? 0;
+          }
+          if (stat.title === "Conversion Rate") {
+            value = "—";
+          }
+
+          return (
+            <StatsCard key={stat.title} {...stat} 
+              value={loading ? "Loading..." : stat.title === "Total Revenue" ? `$${Number(value).toLocaleString()}` : value}
+            />
+          );
+        })}
       </div>
 
       {/* Analytics */}

@@ -7,3 +7,11 @@ export const getDashboardStats = async () => {
 
   return data.stats;
 };
+
+export const getRevenueData = async () => {
+  const data = await apiRequest("/dashboard/revenue", {
+    method: "GET",
+  });
+
+  return data.revenue;
+};
