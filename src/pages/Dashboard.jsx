@@ -4,8 +4,8 @@ import RevenueChart from "@/features/dashboard/components/RevenueChart";
 import StatsCard from "@/features/dashboard/components/StatsCard";
 import UserGrowthChart from "@/features/dashboard/components/UserGrowthChart";
 
-import { activityData, revenueData, statsData, userGrowthData, } from "@/features/dashboard/data/dashboardData";
-import { getDashboardStats } from "@/services/dashboardService";
+import { activityData, statsData, userGrowthData, } from "@/features/dashboard/data/dashboardData";
+import { getDashboardStats, getRevenueData } from "@/services/dashboardService";
 import { useEffect, useState } from "react";
 
 const Dashboard = () => {
@@ -13,23 +13,34 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [revenueData, setRevenueData] = useState([]);
+  const [revenueLoading, setRevenueLoading] = useState(true);
+  const [revenueError, setRevenueError] = useState("");
+
   useEffect(() => {
-    const loadDashboardStats = async () => {
+    const loadDashboardData = async () => {
       try {
         setLoading(true);
-        setError("");
-        const data = await getDashboardStats();
-        setDashboardStats(data);
+        setRevenueLoading(true);
 
+        setError("");
+        setRevenueError("");
+        const [stats, revenue] = await Promise.all([getDashboardStats(), getRevenueData(),]);
+
+        setDashboardStats(stats);
+        setRevenueData(revenue);
       } catch (error) {
-        console.error("Failed to load dashboard stats:", error);
-        setError(error.message || "Failed to load dashboard statistics");
+        console.error("Failed to load dashboard data:", error);
+        setError(error.message || "Failed to load dashboard data");
+        setRevenueError(error.message || "Failed to load revenue data");
+
       } finally {
         setLoading(false);
+        setRevenueLoading(false);
       }
     };
 
-    loadDashboardStats();
+    loadDashboardData();
   }, []);
   
   return (
@@ -71,7 +82,18 @@ const Dashboard = () => {
       {/* Analytics */}
       <div className="grid gap-6 lg:grid-cols-2">
 
-        <RevenueChart data={revenueData} />
+        {
+          revenueLoading ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
+              <p className="text-sm text-muted-foreground">Loading revenue data...</p>
+            </div>
+          ) : revenueError ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
+              <p className="text-sm text-destructive">{revenueError}</p>
+            </div>
+          ) : (<RevenueChart data={revenueData} />)
+        }
+        
         <UserGrowthChart data={userGrowthData} />
 
       </div>
