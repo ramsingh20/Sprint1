@@ -22,3 +22,11 @@ export const getUserGrowthData = async () => {
 
   return data.userGrowth;
 };
+
+export const getRecentActivity = async () => {
+  const data = await apiRequest("/dashboard/activity", {
+    method: "GET",
+  });
+
+  return data.activities;
+};

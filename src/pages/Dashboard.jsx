@@ -4,8 +4,8 @@ import RevenueChart from "@/features/dashboard/components/RevenueChart";
 import StatsCard from "@/features/dashboard/components/StatsCard";
 import UserGrowthChart from "@/features/dashboard/components/UserGrowthChart";
 
-import { activityData, statsData, } from "@/features/dashboard/data/dashboardData";
-import { getDashboardStats, getRevenueData, getUserGrowthData } from "@/services/dashboardService";
+import { statsData, } from "@/features/dashboard/data/dashboardData";
+import { getDashboardStats, getRecentActivity, getRevenueData, getUserGrowthData } from "@/services/dashboardService";
 import { useEffect, useState } from "react";
 
 const Dashboard = () => {
@@ -21,31 +21,40 @@ const Dashboard = () => {
   const [userGrowthLoading, setUserGrowthLoading] = useState(true);
   const [userGrowthError, setUserGrowthError] = useState("");
 
+  const [activityData, setActivityData] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(true);
+  const [activityError, setActivityError] = useState("");
+
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
         setLoading(true);
         setRevenueLoading(true);
         setUserGrowthLoading(true);
+        setActivityLoading(true);
 
         setError("");
         setRevenueError("");
         setUserGrowthError("");
-        const [stats, revenue, userGrowth] = await Promise.all([getDashboardStats(), getRevenueData(), getUserGrowthData(),]);
+        setActivityError("");
+        const [stats, revenue, userGrowth, activity] = await Promise.all([getDashboardStats(), getRevenueData(), getUserGrowthData(), getRecentActivity(),]);
 
         setDashboardStats(stats);
         setRevenueData(revenue);
         setUserGrowthData(userGrowth);
+        setActivityData(activity);
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
         setError(error.message || "Failed to load dashboard data");
         setRevenueError(error.message || "Failed to load revenue data");
         setUserGrowthError(error.message || "Failed to load user growth data");
+        setActivityError(error.message || "Failed to load recent activity");
 
       } finally {
         setLoading(false);
         setRevenueLoading(false);
         setUserGrowthLoading(false);
+        setActivityLoading(false);
       }
     };
 
@@ -117,7 +126,17 @@ const Dashboard = () => {
 
       </div>
 
-      <ActivityTable data={activityData} />   {/* Recent Activity */}
+      {
+        activityLoading ? (
+          <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
+            <p className="text-sm text-muted-foreground">Loading recent activity...</p>
+          </div>
+        ) : activityError ? (
+          <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
+            <p className="text-sm text-destructive">{activityError}</p>
+          </div>
+        ) : (<ActivityTable data={activityData} />)
+      }   {/* Recent Activity */}
 
     </div>
   );
