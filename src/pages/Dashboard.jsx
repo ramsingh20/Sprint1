@@ -86,12 +86,20 @@ const Dashboard = () => {
             value = dashboardStats?.totalOrders ?? 0;
           }
           if (stat.title === "Conversion Rate") {
-            value = "—";
+            value = dashboardStats?.conversionRate ?? 0;
           }
 
           return (
             <StatsCard key={stat.title} {...stat} 
-              value={loading ? "Loading..." : stat.title === "Total Revenue" ? `$${Number(value).toLocaleString()}` : value}
+              value={
+                loading
+                  ? "Loading..."
+                  : stat.title === "Total Revenue"
+                    ? `$${Number(value).toLocaleString()}`
+                    : stat.title === "Conversion Rate"
+                      ? `${Number(value).toFixed(1)}%`
+                      : value
+              }
             />
           );
         })}
