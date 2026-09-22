@@ -6,8 +6,8 @@ import AnalyticsKpiCard from "@/features/analytics/components/AnalyticsKpiCard";
 import AnalyticsRevenueChart from "@/features/analytics/components/AnalyticsRevenueChart";
 import UserAcquisitionChart from "@/features/analytics/components/UserAcquisitionChart";
 import TrafficSourceChart from "@/features/analytics/components/TrafficSourceChart";
-import { analyticsKpiData, analyticsRevenueData, trafficSourceData, userAcquisitionData, } from "@/features/analytics/data/analyticsData";
-import { getAnalyticsStats } from "@/services/analyticsService";
+import { analyticsKpiData, trafficSourceData, userAcquisitionData, } from "@/features/analytics/data/analyticsData";
+import { getAnalyticsRevenue, getAnalyticsStats } from "@/services/analyticsService";
 
 const Analytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
@@ -15,12 +15,15 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [analyticsRevenueData, setAnalyticsRevenueData] = useState([]);
+  const [revenueLoading, setRevenueLoading] = useState(true);
+  const [revenueError, setRevenueError] = useState("");
+
   useEffect(() => {
     const loadAnalyticsStats = async () => {
       try {
         setLoading(true);
         setError("");
-
         const stats = await getAnalyticsStats();
 
         setAnalyticsStats(stats);
@@ -37,6 +40,25 @@ const Analytics = () => {
 
     loadAnalyticsStats();
   }, []);
+
+  useEffect(() => {
+    const loadAnalyticsRevenue = async () => {
+      try {
+        setRevenueLoading(true);
+        setRevenueError("");
+        const revenue = await getAnalyticsRevenue(selectedPeriod);
+
+        setAnalyticsRevenueData(revenue);
+      } catch (error) {
+        console.error("Failed to load analytics revenue:", error);
+        setRevenueError(error.message || "Failed to load revenue data");
+      } finally {
+        setRevenueLoading(false);
+      }
+    };
+
+    loadAnalyticsRevenue();
+  }, [selectedPeriod]);
 
   return (
     <div className="space-y-6 p-6">
@@ -85,7 +107,18 @@ const Analytics = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <AnalyticsRevenueChart data={analyticsRevenueData[selectedPeriod]} />
+        {
+          revenueLoading ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
+              <p className="text-sm text-muted-foreground">Loading revenue data...</p>
+            </div>
+          ) : revenueError ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
+              <p className="text-sm text-destructive">{revenueError}</p>
+            </div>
+          ) : (<AnalyticsRevenueChart data={analyticsRevenueData} />)
+        }
+        
         <UserAcquisitionChart data={userAcquisitionData[selectedPeriod]} />
       </div>
 

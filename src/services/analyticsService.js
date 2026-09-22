@@ -7,3 +7,14 @@ export const getAnalyticsStats = async () => {
 
   return data.stats;
 };
+
+export const getAnalyticsRevenue = async (period) => {
+  const data = await apiRequest(
+    `/analytics/revenue?period=${period}`,
+    {
+      method: "GET",
+    }
+  );
+
+  return data.revenue;
+};
