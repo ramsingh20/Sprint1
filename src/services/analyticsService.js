@@ -18,3 +18,13 @@ export const getAnalyticsRevenue = async (period) => {
 
   return data.revenue;
 };
+export const getUserAcquisition = async (period) => {
+  const data = await apiRequest(
+    `/analytics/user-acquisition?period=${period}`,
+    {
+      method: "GET",
+    }
+  );
+
+  return data.userAcquisition;
+};

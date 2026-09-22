@@ -6,8 +6,8 @@ import AnalyticsKpiCard from "@/features/analytics/components/AnalyticsKpiCard";
 import AnalyticsRevenueChart from "@/features/analytics/components/AnalyticsRevenueChart";
 import UserAcquisitionChart from "@/features/analytics/components/UserAcquisitionChart";
 import TrafficSourceChart from "@/features/analytics/components/TrafficSourceChart";
-import { analyticsKpiData, trafficSourceData, userAcquisitionData, } from "@/features/analytics/data/analyticsData";
-import { getAnalyticsRevenue, getAnalyticsStats } from "@/services/analyticsService";
+import { analyticsKpiData, trafficSourceData, } from "@/features/analytics/data/analyticsData";
+import { getAnalyticsRevenue, getAnalyticsStats, getUserAcquisition } from "@/services/analyticsService";
 
 const Analytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
@@ -18,6 +18,10 @@ const Analytics = () => {
   const [analyticsRevenueData, setAnalyticsRevenueData] = useState([]);
   const [revenueLoading, setRevenueLoading] = useState(true);
   const [revenueError, setRevenueError] = useState("");
+
+  const [userAcquisitionData, setUserAcquisitionData] = useState([]);
+  const [userAcquisitionLoading, setUserAcquisitionLoading] = useState(true);
+  const [userAcquisitionError, setUserAcquisitionError] = useState("");
 
   useEffect(() => {
     const loadAnalyticsStats = async () => {
@@ -58,6 +62,25 @@ const Analytics = () => {
     };
 
     loadAnalyticsRevenue();
+  }, [selectedPeriod]);
+
+  useEffect(() => {
+    const loadUserAcquisition = async () => {
+      try {
+        setUserAcquisitionLoading(true);
+        setUserAcquisitionError("");
+
+        const data = await getUserAcquisition(selectedPeriod);
+        setUserAcquisitionData(data);
+      } catch (error) {
+        console.error("Failed to load user acquisition data:", error);
+        setUserAcquisitionError(error.message || "Failed to load user acquisition data");
+      } finally {
+        setUserAcquisitionLoading(false);
+      }
+    };
+
+    loadUserAcquisition();
   }, [selectedPeriod]);
 
   return (
@@ -119,7 +142,17 @@ const Analytics = () => {
           ) : (<AnalyticsRevenueChart data={analyticsRevenueData} />)
         }
         
-        <UserAcquisitionChart data={userAcquisitionData[selectedPeriod]} />
+        {
+          userAcquisitionLoading ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
+              <p className="text-sm text-muted-foreground">Loading user acquisition data...</p>
+            </div>
+          ) : userAcquisitionError ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
+              <p className="text-sm text-destructive">{userAcquisitionError}</p>
+            </div>
+          ) : (<UserAcquisitionChart data={userAcquisitionData} />)
+        }
       </div>
 
       <div>
