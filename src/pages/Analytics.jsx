@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CalendarDays } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 
@@ -7,9 +7,36 @@ import AnalyticsRevenueChart from "@/features/analytics/components/AnalyticsReve
 import UserAcquisitionChart from "@/features/analytics/components/UserAcquisitionChart";
 import TrafficSourceChart from "@/features/analytics/components/TrafficSourceChart";
 import { analyticsKpiData, analyticsRevenueData, trafficSourceData, userAcquisitionData, } from "@/features/analytics/data/analyticsData";
+import { getAnalyticsStats } from "@/services/analyticsService";
 
 const Analytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
+  const [analyticsStats, setAnalyticsStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadAnalyticsStats = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const stats = await getAnalyticsStats();
+
+        setAnalyticsStats(stats);
+      } catch (error) {
+        console.error("Failed to load analytics statistics:", error);
+
+        setError(
+          error.message || "Failed to load analytics statistics"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAnalyticsStats();
+  }, []);
 
   return (
     <div className="space-y-6 p-6">
@@ -32,9 +59,29 @@ const Analytics = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {analyticsKpiData.map((item) => (
-          <AnalyticsKpiCard key={item.title} {...item} />
-        ))}
+        {analyticsKpiData.map((item) => {
+          let value = 0;
+
+          if (item.title === "Total Customers") {
+            value = analyticsStats?.totalCustomers ?? 0;
+          }
+          if (item.title === "Total Orders") {
+            value = analyticsStats?.totalOrders ?? 0;
+          }
+          if (item.title === "Conversion Rate") {
+            value = analyticsStats?.conversionRate ?? 0;
+          }
+
+          return (
+            <AnalyticsKpiCard
+              key={item.title}
+              {...item}
+              value={
+                loading ? "Loading..." : item.title === "Conversion Rate" ? `${Number(value).toFixed(1)}%` : value
+              }
+            />
+          );
+        })}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
