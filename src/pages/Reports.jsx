@@ -1,5 +1,5 @@
 import { CalendarDays, Download } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/common/PageHeader";
 import ReportKpiCard from "@/features/reports/components/ReportKpiCard";
@@ -7,10 +7,15 @@ import { reportKpiData, reportRevenueData, reportTableData, } from "@/features/r
 import ReportRevenueChart from "@/features/reports/components/ReportRevenueChart";
 import ReportTable from "@/features/reports/components/ReportTable";
 import { exportToCsv } from "@/utils/exportCsv";
+import { getReportStats } from "@/services/reportsService";
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
   const [search, setSearch] = useState("");
+
+  const [reportStats, setReportStats] = useState(null);
+  const [reportStatsLoading, setReportStatsLoading] = useState(true);
+  const [reportStatsError, setReportStatsError] = useState("");
 
   const filteredReports = useMemo(() => {
     return reportTableData.filter((item) => {
@@ -32,9 +37,34 @@ const Reports = () => {
     }));
 
     if (exportData.length === 0) { return; }
-
     exportToCsv(`pulseboard-report-${selectedPeriod}-days.csv`, exportData );
   };
+
+  useEffect(() => {
+    const loadReportStats = async () => {
+      try {
+        setReportStatsLoading(true);
+        setReportStatsError("");
+
+        const stats = await getReportStats(selectedPeriod);
+
+        setReportStats(stats);
+      } catch (error) {
+        console.error(
+          "Failed to load report statistics:",
+          error
+        );
+
+        setReportStatsError(
+          error.message || "Failed to load report statistics"
+        );
+      } finally {
+        setReportStatsLoading(false);
+      }
+    };
+
+    loadReportStats();
+  }, [selectedPeriod]);
 
   return (
     <div className="space-y-6">
@@ -60,10 +90,34 @@ const Reports = () => {
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {reportKpiData.map((item) => (
-          <ReportKpiCard key={item.title} {...item} />
-        ))}
+        {reportKpiData.map((item) => {
+          let value = 0;
+
+          if (item.title === "Total Revenue") {
+            value = reportStats?.totalRevenue ?? 0;
+          }
+          if (item.title === "Total Orders") {
+            value = reportStats?.totalOrders ?? 0;
+          }
+          if (item.title === "Total Customers") {
+            value = reportStats?.totalCustomers ?? 0;
+          }
+          if (item.title === "Average Order Value") {
+            value = reportStats?.averageOrderValue ?? 0;
+          }
+
+          return (
+            <ReportKpiCard key={item.title} {...item}
+              value={ reportStatsLoading ? "Loading...": item.title === "Total Revenue" || item.title === "Average Order Value" ? `$${Number(value).toLocaleString()}` : value}
+            />
+          );
+        })}
       </div>
+      {reportStatsError && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+          <p className="text-sm text-destructive">{reportStatsError}</p>
+        </div>
+      )}
       <div className="grid gap-6">
         <ReportRevenueChart data={reportRevenueData[selectedPeriod]} />
         <ReportTable  data={filteredReports} search={search} onSearchChange={setSearch} />
