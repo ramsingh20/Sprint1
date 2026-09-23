@@ -6,7 +6,7 @@ import AnalyticsKpiCard from "@/features/analytics/components/AnalyticsKpiCard";
 import AnalyticsRevenueChart from "@/features/analytics/components/AnalyticsRevenueChart";
 import UserAcquisitionChart from "@/features/analytics/components/UserAcquisitionChart";
 import TrafficSourceChart from "@/features/analytics/components/TrafficSourceChart";
-import { analyticsKpiData, trafficSourceData, } from "@/features/analytics/data/analyticsData";
+import { analyticsKpiData, } from "@/features/analytics/data/analyticsData";
 import { getAnalyticsRevenue, getAnalyticsStats, getUserAcquisition } from "@/services/analyticsService";
 
 const Analytics = () => {
@@ -22,6 +22,10 @@ const Analytics = () => {
   const [userAcquisitionData, setUserAcquisitionData] = useState([]);
   const [userAcquisitionLoading, setUserAcquisitionLoading] = useState(true);
   const [userAcquisitionError, setUserAcquisitionError] = useState("");
+
+  const [trafficSources, setTrafficSources] = useState([]);
+  const [trafficSourcesLoading, setTrafficSourcesLoading] = useState(true);
+  const [trafficSourcesError, setTrafficSourcesError] = useState("");
 
   useEffect(() => {
     const loadAnalyticsStats = async () => {
@@ -81,6 +85,32 @@ const Analytics = () => {
     };
 
     loadUserAcquisition();
+  }, [selectedPeriod]);
+
+  useEffect(() => {
+    const loadTrafficSources = async () => {
+      try {
+        setTrafficSourcesLoading(true);
+        setTrafficSourcesError("");
+
+        const data = await getTrafficSources(selectedPeriod);
+
+        setTrafficSources(data);
+      } catch (error) {
+        console.error(
+          "Failed to load traffic source data:",
+          error
+        );
+
+        setTrafficSourcesError(
+          error.message || "Failed to load traffic source data"
+        );
+      } finally {
+        setTrafficSourcesLoading(false);
+      }
+    };
+
+    loadTrafficSources();
   }, [selectedPeriod]);
 
   return (
@@ -156,7 +186,19 @@ const Analytics = () => {
       </div>
 
       <div>
-        <TrafficSourceChart data={trafficSourceData[selectedPeriod]} />
+        <div>
+          {
+            trafficSourcesLoading ? (
+              <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
+                <p className="text-sm text-muted-foreground">Loading traffic source data...</p>
+              </div>
+            ) : trafficSourcesError ? (
+              <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
+                <p className="text-sm text-destructive">{trafficSourcesError}</p>
+              </div>
+            ) : (<TrafficSourceChart data={trafficSources} />)
+          }
+        </div>
       </div>
 
     </div>

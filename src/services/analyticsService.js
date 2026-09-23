@@ -28,3 +28,14 @@ export const getUserAcquisition = async (period) => {
 
   return data.userAcquisition;
 };
+
+export const getTrafficSources = async (period) => {
+  const data = await apiRequest(
+    `/analytics/traffic-sources?period=${period}`,
+    {
+      method: "GET",
+    }
+  );
+
+  return data.trafficSources;
+};
