@@ -10,3 +10,14 @@ export const getReportStats = async (period) => {
 
   return data.stats;
 };
+
+export const getReportRevenue = async (period) => {
+  const data = await apiRequest(
+    `/reports/revenue?period=${period}`,
+    {
+      method: "GET",
+    }
+  );
+
+  return data.revenue;
+};

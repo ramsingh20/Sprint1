@@ -3,11 +3,11 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/common/PageHeader";
 import ReportKpiCard from "@/features/reports/components/ReportKpiCard";
-import { reportKpiData, reportRevenueData, reportTableData, } from "@/features/reports/data/reportsData";
+import { reportKpiData, reportTableData, } from "@/features/reports/data/reportsData";
 import ReportRevenueChart from "@/features/reports/components/ReportRevenueChart";
 import ReportTable from "@/features/reports/components/ReportTable";
 import { exportToCsv } from "@/utils/exportCsv";
-import { getReportStats } from "@/services/reportsService";
+import { getReportRevenue, getReportStats } from "@/services/reportsService";
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
@@ -16,6 +16,10 @@ const Reports = () => {
   const [reportStats, setReportStats] = useState(null);
   const [reportStatsLoading, setReportStatsLoading] = useState(true);
   const [reportStatsError, setReportStatsError] = useState("");
+
+  const [reportRevenue, setReportRevenue] = useState([]);
+  const [reportRevenueLoading, setReportRevenueLoading] = useState(true);
+  const [reportRevenueError, setReportRevenueError] = useState("");
 
   const filteredReports = useMemo(() => {
     return reportTableData.filter((item) => {
@@ -64,6 +68,25 @@ const Reports = () => {
     };
 
     loadReportStats();
+  }, [selectedPeriod]);
+
+  useEffect(() => {
+    const loadReportRevenue = async () => {
+      try {
+        setReportRevenueLoading(true);
+        setReportRevenueError("");
+
+        const data = await getReportRevenue(selectedPeriod);
+        setReportRevenue(data);
+      } catch (error) {
+        console.error("Failed to load report revenue:",error);
+        setReportRevenueError(error.message || "Failed to load report revenue");
+      } finally {
+        setReportRevenueLoading(false);
+      }
+    };
+
+    loadReportRevenue();
   }, [selectedPeriod]);
 
   return (
@@ -119,7 +142,17 @@ const Reports = () => {
         </div>
       )}
       <div className="grid gap-6">
-        <ReportRevenueChart data={reportRevenueData[selectedPeriod]} />
+        {
+          reportRevenueLoading ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
+              <p className="text-sm text-muted-foreground">Loading report revenue...</p>
+            </div>
+          ) : reportRevenueError ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
+              <p className="text-sm text-destructive">{reportRevenueError}</p>
+            </div>
+          ) : (<ReportRevenueChart data={reportRevenue} />)
+        }
         <ReportTable  data={filteredReports} search={search} onSearchChange={setSearch} />
       </div>
     </div>
