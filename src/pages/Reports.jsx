@@ -3,11 +3,11 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/common/PageHeader";
 import ReportKpiCard from "@/features/reports/components/ReportKpiCard";
-import { reportKpiData, reportTableData, } from "@/features/reports/data/reportsData";
+import { reportKpiData, } from "@/features/reports/data/reportsData";
 import ReportRevenueChart from "@/features/reports/components/ReportRevenueChart";
 import ReportTable from "@/features/reports/components/ReportTable";
 import { exportToCsv } from "@/utils/exportCsv";
-import { getReportRevenue, getReportStats } from "@/services/reportsService";
+import { getReportRevenue, getReportStats, getReportTable } from "@/services/reportsService";
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
@@ -20,6 +20,10 @@ const Reports = () => {
   const [reportRevenue, setReportRevenue] = useState([]);
   const [reportRevenueLoading, setReportRevenueLoading] = useState(true);
   const [reportRevenueError, setReportRevenueError] = useState("");
+
+  const [reportTableData, setReportTableData] = useState([]);
+  const [reportTableLoading, setReportTableLoading] = useState(true);
+  const [reportTableError, setReportTableError] = useState("");
 
   const filteredReports = useMemo(() => {
     return reportTableData.filter((item) => {
@@ -89,6 +93,25 @@ const Reports = () => {
     loadReportRevenue();
   }, [selectedPeriod]);
 
+  useEffect(() => {
+    const loadReportTable = async () => {
+      try {
+        setReportTableLoading(true);
+        setReportTableError("");
+
+        const data = await getReportTable(selectedPeriod);
+        setReportTableData(data);
+      } catch (error) {
+        console.error("Failed to load report table:", error);
+        setReportTableError(error.message || "Failed to load report table");
+      } finally {
+        setReportTableLoading(false);
+      }
+    };
+
+    loadReportTable();
+  }, [selectedPeriod]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -153,7 +176,17 @@ const Reports = () => {
             </div>
           ) : (<ReportRevenueChart data={reportRevenue} />)
         }
-        <ReportTable  data={filteredReports} search={search} onSearchChange={setSearch} />
+        {
+          reportTableLoading ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
+              <p className="text-sm text-muted-foreground">Loading report data...</p>
+            </div>
+          ) : reportTableError ? (
+            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
+              <p className="text-sm text-destructive">{reportTableError}</p>
+            </div>
+          ) : (<ReportTable data={reportTableData} search={search} onSearchChange={setSearch} />)
+        }
       </div>
     </div>
   );

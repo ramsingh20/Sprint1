@@ -21,3 +21,14 @@ export const getReportRevenue = async (period) => {
 
   return data.revenue;
 };
+
+export const getReportTable = async (period) => {
+  const data = await apiRequest(
+    `/reports/table?period=${period}`,
+    {
+      method: "GET",
+    }
+  );
+
+  return data.reports;
+};

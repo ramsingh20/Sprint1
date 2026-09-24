@@ -26,7 +26,7 @@ const ReportRevenueChart = ({ data }) => {
               <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border" />
 
               <XAxis
-                dataKey="date"
+                dataKey="month"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={10}
