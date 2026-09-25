@@ -1,10 +1,11 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RotateCcw, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import AppearanceSettings from "@/features/settings/components/AppearanceSettings";
+import { getCurrentUser, updateCurrentUser } from "@/services/authService";
 
 const generalSettingsSchema = z.object({
   workspaceName: z
@@ -31,15 +32,28 @@ const GeneralSettings = () => {
         defaultValues,
     });
 
-    const onSubmit = async (values) => {
-        console.log("General settings:", values);
+    useEffect(() => {
+      let active = true;
+      getCurrentUser().then(({ user }) => {
+        if (active && user?.generalSettings) reset(user.generalSettings);
+      }).catch((error) => {
+        toast.error(error.message || "Failed to load general settings.");
+      });
+      return () => { active = false; };
+    }, [reset]);
 
-        await new Promise((resolve) => setTimeout(resolve, 500));
+    const onSubmit = async (values) => {
+      try {
+        const { user } = await updateCurrentUser({ generalSettings: values });
+        reset(user.generalSettings);
         toast.success("General settings updated successfully.");
+      } catch (error) {
+        toast.error(error.message || "Failed to update general settings.");
+      }
     };
 
     const handleReset = () => {
-        reset(defaultValues);
+        reset();
         toast.info("Changes have been reset.");
     };
 
