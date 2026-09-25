@@ -7,12 +7,12 @@ import Dashboard from '@/pages/Dashboard'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
 import NotFound from '@/pages/NotFound'
+import Orders from '@/pages/Orders'
 import Profile from '@/pages/Profile'
 import Register from '@/pages/Register'
 import Reports from '@/pages/Reports'
 import Settings from '@/pages/Settings'
 import Users from '@/pages/Users'
-import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 const Router = () => {
@@ -33,6 +33,7 @@ const Router = () => {
               <Route element={<RoleProtectedRoute allowedRoles={["Admin", "Manager"]} />}>
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="reports" element={<Reports />} />
+                <Route path="orders" element={<Orders />} />
               </Route>
 
               <Route element={<RoleProtectedRoute allowedRoles={["Admin"]} />}>
@@ -54,3 +55,5 @@ const Router = () => {
 }
 
 export default Router
+
+

@@ -1,4 +1,4 @@
-import { ChartColumn, LayoutDashboard, PersonStanding, Settings, ShoppingCart, Users } from "lucide-react";
+import { ChartColumn, ClipboardList, LayoutDashboard, PersonStanding, Settings, ShoppingCart, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
 import { useSelector } from "react-redux";
@@ -21,6 +21,12 @@ const sidebarData = [
     url: "/dashboard/users",
     icon: Users,
     roles: ["Admin"],
+  },
+  {
+    title: "Orders",
+    url: "/dashboard/orders",
+    icon: ClipboardList,
+    roles: ["Admin", "Manager"],
   },
   {
     title: "Reports",
@@ -67,3 +73,4 @@ const NavMain = () => {
 };
 
 export default NavMain;
+
