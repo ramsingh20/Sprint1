@@ -7,7 +7,7 @@ import AnalyticsRevenueChart from "@/features/analytics/components/AnalyticsReve
 import UserAcquisitionChart from "@/features/analytics/components/UserAcquisitionChart";
 import TrafficSourceChart from "@/features/analytics/components/TrafficSourceChart";
 import { analyticsKpiData, } from "@/features/analytics/data/analyticsData";
-import { getAnalyticsRevenue, getAnalyticsStats, getUserAcquisition } from "@/services/analyticsService";
+import { getAnalyticsRevenue, getAnalyticsStats, getTrafficSources, getUserAcquisition } from "@/services/analyticsService";
 
 const Analytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");

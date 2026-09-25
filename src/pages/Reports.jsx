@@ -26,14 +26,10 @@ const Reports = () => {
   const [reportTableError, setReportTableError] = useState("");
 
   const filteredReports = useMemo(() => {
-    return reportTableData.filter((item) => {
-      const searchValue = search.trim().toLowerCase();
+    const searchValue = search.trim().toLowerCase();
 
-      return (
-        item.id.toLowerCase().includes(searchValue) || item.date.toLowerCase().includes(searchValue)
-      );
-    });
-  }, [search]);
+    return reportTableData.filter((item) => item.date.toLowerCase().includes(searchValue));
+  }, [reportTableData, search]);
 
   const handleExport = () => {
     const exportData = filteredReports.map((item) => ({

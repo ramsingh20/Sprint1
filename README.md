@@ -1,16 +1,149 @@
-# React + Vite
+🔥 Then we continue with the original feature roadmap
+After Reports is stable, we are NOT finished.
+The next major stages will be:
+Phase 11 — Settings → Real Backend Persistence
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Currently:
+General Settings → mostly frontend/demo persistence
+Notifications → frontend state
+Appearance → local theme state
+Security → partly simulated
 
-Currently, two official plugins are available:
+We'll make the relevant settings actually persist.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Phase 12 — Security & Session Management
 
-## React Compiler
+This is one of the important remaining industry-level areas:
+Change password
+JWT/session handling
+Logout cleanup
+Token expiry handling
+Unauthorized API handling
+Account/session management
+2FA architecture where appropriate
+Security validation
+Phase 13 — Orders Module
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This is a major missing business module.
 
-## Expanding the ESLint configuration
+We'll build:
+Orders list
+Order details
+Search
+Filters
+Status
+Pagination
+Order API
+MongoDB integration
+Admin/Manager permissions
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This will also make Dashboard, Analytics and Reports much more realistic because they'll be based on a proper business entity.
+
+Phase 14 — Customers Module
+Customer list
+Customer details
+Search/filter
+Order history
+Customer status
+Real APIs
+Phase 15 — Advanced Dashboard
+
+After Orders + Customers exist, we can improve:
+KPIs
+Revenue
+Customer growth
+Recent activity
+Business trends
+Better date filtering
+Phase 16 — Application Polish
+Responsive behavior
+Empty states
+Skeleton loading
+Toasts
+Confirmation dialogs
+Error boundaries
+Accessibility
+UI consistency
+Phase 17 — Production Readiness
+Environment configuration
+API configuration
+CORS
+Build verification
+Deployment
+Database production setup
+Security review
+GitHub README
+Project documentation
+🎯 The important part
+
+We're no longer treating “UI exists” = “feature complete.”
+
+For every major feature, we'll aim for:
+
+UI → API → Database → Authentication → Authorization → Validation → Error handling → Loading state → Testing → Production cleanup
+
+That's what will take PulseBoard from a portfolio dashboard toward an industry-level full-stack application.
+
+
+Ek line mein interviewer ko kya bolna hai?
+
+"PulseBoard is a business management and analytics dashboard where admins can manage users and monitor important business information such as customers, orders, revenue, analytics, and reports from a single platform."
+
+Aur agar interviewer bole "Iska real-world use kya hai?"
+
+Aap bol sakte ho:
+"For example, an e-commerce company can use PulseBoard internally to monitor its business performance, manage users, track orders and revenue, and generate reports for decision-making."
+
+
+Maan lo ek company online business / e-commerce business chala rahi hai. Us company ke paas bahut saara data hai:
+
+Kitne customers hain?
+Kitne orders aaye?
+Kitni sales/revenue hui?
+Kaunse users active hain?
+New customers kitne aaye?
+Customers kahan se aa rahe hain?
+Business ki performance kaisi chal rahi hai?
+
+PulseBoard ye saari information ek hi jagah par dikhata hai.
+
+Example
+
+Company ka Admin PulseBoard mein login karta hai.
+
+Usko Dashboard par dikhta hai:
+
+Revenue: $50,000
+Orders: 1,250
+Customers: 850
+
+Phir Admin Users section mein jaakar dekh sakta hai:
+
+John — Active — User
+Rahul — Inactive — User
+Priya — Active — Manager
+
+Admin zarurat padne par user ko:
+
+Edit
+Delete
+Activate
+Deactivate
+
+kar sakta hai.
+
+Analytics mein
+
+Admin dekh sakta hai:
+
+📈 Revenue kaise grow ho raha hai
+👥 New customers kitne aa rahe hain
+🌐 Customers Google, Facebook, Instagram etc. se kitne aa rahe hain
+
+Reports mein
+
+Admin detailed business report dekh sakta hai:
+
+Date → Orders → Revenue → Customers → Average Order
+
+Aur report ko CSV file mein export bhi kar sakta hai
