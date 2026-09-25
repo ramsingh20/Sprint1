@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,6 +27,7 @@ const defaultValues = {
 };
 
 const GeneralSettings = () => {
+    const [isLoading, setIsLoading] = useState(true);
     const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty }, } = useForm({
         resolver: zodResolver(generalSettingsSchema),
         defaultValues,
@@ -34,11 +35,17 @@ const GeneralSettings = () => {
 
     useEffect(() => {
       let active = true;
-      getCurrentUser().then(({ user }) => {
-        if (active && user?.generalSettings) reset(user.generalSettings);
-      }).catch((error) => {
-        toast.error(error.message || "Failed to load general settings.");
-      });
+      const loadSettings = async () => {
+        try {
+          const { user } = await getCurrentUser();
+          if (active && user?.generalSettings) reset(user.generalSettings);
+        } catch (error) {
+          if (active) toast.error(error.message || "Failed to load general settings.");
+        } finally {
+          if (active) setIsLoading(false);
+        }
+      };
+      loadSettings();
       return () => { active = false; };
     }, [reset]);
 
@@ -59,6 +66,8 @@ const GeneralSettings = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {isLoading && <p role="status" className="text-sm text-muted-foreground">Loading general settings...</p>}
+      <fieldset disabled={isLoading || isSubmitting} className="space-y-6">
       {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-foreground">General Settings</h2>
@@ -128,6 +137,7 @@ const GeneralSettings = () => {
           <Save className="size-4" /> {isSubmitting ? "Saving..." : "Save Changes"}
         </Button>
       </div>
+      </fieldset>
     </form>
   );
 };
