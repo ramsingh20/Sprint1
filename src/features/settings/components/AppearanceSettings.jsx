@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { toast } from "sonner";
+import { updateCurrentUser } from "@/services/authService";
 import { useTheme } from "@/context/ThemeContext";
 
 const themeOptions = [
@@ -24,12 +26,24 @@ const themeOptions = [
 ];
 
 const AppearanceSettings = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isThemeLoading } = useTheme();
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleThemeChange = (value) => {
+  const handleThemeChange = async (value) => {
+    if (isSaving || value === theme) return;
+    const previousTheme = theme;
     setTheme(value);
-    const themeLabel = value.charAt(0).toUpperCase() + value.slice(1);
-    toast.success(`Appearance changed to ${themeLabel}.`);
+    setIsSaving(true);
+    try {
+      await updateCurrentUser({ appearancePreference: value });
+      const themeLabel = value.charAt(0).toUpperCase() + value.slice(1);
+      toast.success("Appearance changed to " + themeLabel + ".");
+    } catch (error) {
+      setTheme(previousTheme);
+      toast.error(error.message || "Failed to save appearance preference.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -55,6 +69,7 @@ const AppearanceSettings = () => {
                     <button
                         key={option.value}
                         type="button"
+                        disabled={isThemeLoading || isSaving}
                         onClick={() => handleThemeChange(option.value)}
                         className={`group rounded-xl border p-4 text-left transition-all ${isSelected ? "border-primary bg-primary/5 ring-2 ring-primary/20" : "border-border bg-background hover:border-primary/50 hover:bg-muted/50"}`}
                     >

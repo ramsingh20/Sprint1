@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { changePassword } from "@/services/authService";
 import { Eye, EyeOff, KeyRound, Monitor, ShieldCheck, Smartphone, LogOut, } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 const SecuritySettings = () => {
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -52,7 +54,7 @@ const SecuritySettings = () => {
     }));
   };
 
-  const handleChangePassword = (event) => {
+  const handleChangePassword = async (event) => {
     event.preventDefault();
 
     if (!passwords.current) {
@@ -68,12 +70,19 @@ const SecuritySettings = () => {
       return;
     }
 
-    toast.success("Password updated successfully.");
-    setPasswords({
-      current: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+    setIsChangingPassword(true);
+    try {
+      await changePassword({
+        currentPassword: passwords.current,
+        newPassword: passwords.newPassword,
+      });
+      setPasswords({ current: "", newPassword: "", confirmPassword: "" });
+      toast.success("Password updated successfully.");
+    } catch (error) {
+      toast.error(error.message || "Failed to update password.");
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const handleTwoFactorToggle = () => {
@@ -187,7 +196,7 @@ const SecuritySettings = () => {
             </div>
           </div>
           <div className="flex justify-end border-t border-border pt-5">
-            <Button type="submit">Change Password</Button>
+            <Button type="submit" disabled={isChangingPassword}>{isChangingPassword ? "Changing Password..." : "Change Password"}</Button>
           </div>
         </form>
       </section>

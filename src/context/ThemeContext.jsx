@@ -1,8 +1,32 @@
-import { createContext, useContext, useEffect, useState, } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { getCurrentUser } from "@/services/authService";
 const ThemeContext = createContext(null);
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {return localStorage.getItem("theme") || "system"});
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "system");
+  const [themeLoadedForUser, setThemeLoadedForUser] = useState(null);
+  const isThemeLoading = Boolean(userInfo) && themeLoadedForUser !== userInfo;
+
+  useEffect(() => {
+    let active = true;
+    const loadSavedTheme = async () => {
+      if (!userInfo) return;
+      try {
+        const { user } = await getCurrentUser();
+        if (active && ["light", "dark", "system"].includes(user?.appearancePreference)) {
+          setTheme(user.appearancePreference);
+        }
+      } catch (error) {
+        if (active) console.error("Failed to load saved appearance preference:", error);
+      } finally {
+        if (active) setThemeLoadedForUser(userInfo);
+      }
+    };
+    loadSavedTheme();
+    return () => { active = false; };
+  }, [userInfo]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -36,7 +60,7 @@ export const ThemeProvider = ({ children }) => {
   const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, darkMode: isDark,}}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, darkMode: isDark, isThemeLoading }}>
       {children}
     </ThemeContext.Provider>
   );
