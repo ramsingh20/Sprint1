@@ -4,6 +4,7 @@ import DashboardLayout from '@/layouts/DashboardLayout'
 import PublicLayout from '@/layouts/PublicLayout'
 import  Analytics from '@/pages/Analytics'
 import Dashboard from '@/pages/Dashboard'
+import Customers from '@/pages/Customers'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
 import NotFound from '@/pages/NotFound'
@@ -34,6 +35,7 @@ const Router = () => {
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="orders" element={<Orders />} />
+                <Route path="customers" element={<Customers />} />
               </Route>
 
               <Route element={<RoleProtectedRoute allowedRoles={["Admin"]} />}>
@@ -55,5 +57,6 @@ const Router = () => {
 }
 
 export default Router
+
 
 
