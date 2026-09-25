@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell, Mail, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { getCurrentUser, updateCurrentUser } from "@/services/authService";
 
 const defaultPreferences = {
   orderUpdates: true,
@@ -54,13 +55,30 @@ const notificationGroups = [
 ];
 
 const NotificationSettings = () => {
-  const [preferences, setPreferences] = useState(() => {
-    const savedPreferences = localStorage.getItem("notification-preferences");
+  const [preferences, setPreferences] = useState(defaultPreferences);
+  const [savedPreferences, setSavedPreferences] = useState(defaultPreferences);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-    return savedPreferences ? JSON.parse(savedPreferences) : defaultPreferences;
-  });
-
-  const [savedPreferences, setSavedPreferences] = useState(preferences);
+  useEffect(() => {
+    let active = true;
+    const loadPreferences = async () => {
+      try {
+        const { user } = await getCurrentUser();
+        const saved = { ...defaultPreferences, ...user?.notificationPreferences };
+        if (active) {
+          setPreferences(saved);
+          setSavedPreferences(saved);
+        }
+      } catch (error) {
+        if (active) toast.error(error.message || "Failed to load notification preferences.");
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    };
+    loadPreferences();
+    return () => { active = false; };
+  }, []);
 
   const hasChanges = JSON.stringify(preferences) !== JSON.stringify(savedPreferences);
 
@@ -71,11 +89,19 @@ const NotificationSettings = () => {
     }));
   };
 
-  const handleSave = () => {
-    localStorage.setItem("notification-preferences", JSON.stringify(preferences));
-
-    setSavedPreferences(preferences);
-    toast.success("Notification preferences updated successfully.");
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      const { user } = await updateCurrentUser({ notificationPreferences: preferences });
+      const saved = { ...defaultPreferences, ...user.notificationPreferences };
+      setPreferences(saved);
+      setSavedPreferences(saved);
+      toast.success("Notification preferences updated successfully.");
+    } catch (error) {
+      toast.error(error.message || "Failed to update notification preferences.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleReset = () => {
@@ -93,6 +119,8 @@ const NotificationSettings = () => {
         <p className="mt-1 text-sm text-muted-foreground">Manage how and when you receive notifications.</p>
       </div>
 
+      {isLoading && <p role="status" className="text-sm text-muted-foreground">Loading notification preferences...</p>}
+      <fieldset disabled={isLoading || isSaving} className="space-y-6">
       <div className="space-y-6">
         {notificationGroups.map((group) => {
           const Icon = group.icon;
@@ -141,9 +169,10 @@ const NotificationSettings = () => {
       </div>
 
       <div className="flex flex-col-reverse gap-2 border-t border-border pt-6 sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" disabled={!hasChanges} onClick={handleReset}>Reset</Button>
-        <Button type="button" disabled={!hasChanges} onClick={handleSave}>Save Changes</Button>
+        <Button type="button" variant="outline" disabled={!hasChanges || isSaving} onClick={handleReset}>Reset</Button>
+        <Button type="button" disabled={!hasChanges || isSaving} onClick={handleSave}>{isSaving ? "Saving..." : "Save Changes"}</Button>
       </div>
+      </fieldset>
     </div>
   );
 };
