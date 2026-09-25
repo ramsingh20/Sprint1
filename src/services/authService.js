@@ -27,6 +27,22 @@ export const updateCurrentUser = async (userData) => {
   });
 };
 
+export const getSessions = async () => {
+  return apiRequest("/auth/sessions", { method: "GET" });
+};
+
+export const revokeSession = async (sid) => {
+  return apiRequest("/auth/sessions/" + encodeURIComponent(sid), { method: "DELETE" });
+};
+
+export const revokeOtherSessions = async () => {
+  return apiRequest("/auth/sessions/others", { method: "DELETE" });
+};
+
+export const logoutCurrentSession = async () => {
+  return apiRequest("/auth/logout", { method: "POST" });
+};
+
 export const changePassword = async ({
   currentPassword,
   newPassword,

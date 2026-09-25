@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { changePassword } from "@/services/authService";
-import { Eye, EyeOff, KeyRound, Monitor, ShieldCheck, Smartphone, LogOut, } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Monitor, ShieldCheck, Smartphone, LogOut } from "lucide-react";
+import { getSessions, revokeOtherSessions, revokeSession } from "@/services/authService";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -15,35 +16,25 @@ const SecuritySettings = () => {
     confirmPassword: "",
   });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [sessions, setSessions] = useState([
-    {
-      id: 1,
-      device: "Chrome",
-      platform: "Windows",
-      location: "Mumbai, India",
-      lastActive: "Active now",
-      current: true,
-      icon: Monitor,
-    },
-    {
-      id: 2,
-      device: "Microsoft Edge",
-      platform: "Windows",
-      location: "Mumbai, India",
-      lastActive: "2 hours ago",
-      current: false,
-      icon: Monitor,
-    },
-    {
-      id: 3,
-      device: "Chrome",
-      platform: "Android",
-      location: "Mumbai, India",
-      lastActive: "Yesterday",
-      current: false,
-      icon: Smartphone,
-    },
-  ]);
+  const [sessions, setSessions] = useState([]);
+  const [isLoadingSessions, setIsLoadingSessions] = useState(true);
+  const [sessionAction, setSessionAction] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    const loadSessions = async () => {
+      try {
+        const { sessions: currentSessions } = await getSessions();
+        if (active) setSessions(currentSessions);
+      } catch (error) {
+        if (active) toast.error(error.message || "Failed to load active sessions.");
+      } finally {
+        if (active) setIsLoadingSessions(false);
+      }
+    };
+    loadSessions();
+    return () => { active = false; };
+  }, []);
 
   const handlePasswordChange = (event) => {
     const { name, value } = event.target;
@@ -92,14 +83,30 @@ const SecuritySettings = () => {
     toast.success(nextValue ? "Two-factor authentication enabled." : "Two-factor authentication disabled.");
   };
 
-  const handleSignOutSession = (sessionId) => {
-    setSessions((current) =>current.filter((session) => session.id !== sessionId));
-    toast.success("Session signed out successfully.");
+  const handleSignOutSession = async (sessionId) => {
+    try {
+      setSessionAction(sessionId);
+      await revokeSession(sessionId);
+      setSessions((current) => current.filter((session) => session.id !== sessionId));
+      toast.success("Session signed out successfully.");
+    } catch (error) {
+      toast.error(error.message || "Failed to sign out session.");
+    } finally {
+      setSessionAction("");
+    }
   };
 
-  const handleSignOutOthers = () => {
-    setSessions((current) =>current.filter((session) => session.current));
-    toast.success("Other sessions have been signed out.");
+  const handleSignOutOthers = async () => {
+    try {
+      setSessionAction("others");
+      await revokeOtherSessions();
+      setSessions((current) => current.filter((session) => session.current));
+      toast.success("Other sessions have been signed out.");
+    } catch (error) {
+      toast.error(error.message || "Failed to sign out other sessions.");
+    } finally {
+      setSessionAction("");
+    }
   };
 
   const passwordInputClass = "h-10 w-full rounded-md border border-input bg-background px-3 pr-10 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20";
@@ -234,53 +241,50 @@ const SecuritySettings = () => {
             <h3 className="text-sm font-semibold text-foreground">Active Sessions</h3>
             <p className="mt-1 text-xs text-muted-foreground">Manage devices currently signed into your account.</p>
           </div>
-          {sessions.length > 1 && (
-            <Button type="button" variant="outline" size="sm" onClick={handleSignOutOthers} className="gap-2">
-              <LogOut className="size-4" />Sign Out Others
+          {sessions.some((session) => !session.current) && (
+            <Button type="button" variant="outline" size="sm" onClick={handleSignOutOthers} disabled={Boolean(sessionAction)} className="gap-2">
+              <LogOut className="size-4" />{sessionAction === "others" ? "Signing out..." : "Sign Out Others"}
             </Button>
           )}
         </div>
-
-        <div className="divide-y divide-border">
-          {sessions.map((session) => {
-            const Icon = session.icon;
-            return (
-              <div key={session.id} className="flex items-center justify-between gap-4 p-5">
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                    <Icon className="size-5" />
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-medium text-foreground">{session.device}</p>
-                      {session.current && (
-                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-400">
-                          Current
-                        </span>
-                      )}
+        {isLoadingSessions ? (
+          <p role="status" className="p-5 text-sm text-muted-foreground">Loading active sessions...</p>
+        ) : sessions.length === 0 ? (
+          <p className="p-5 text-sm text-muted-foreground">No active sessions found.</p>
+        ) : (
+          <div className="divide-y divide-border">
+            {sessions.map((session) => {
+              const isMobile = /Mobile|Android|iPhone|iPad/i.test(session.userAgent || "");
+              const Icon = isMobile ? Smartphone : Monitor;
+              return (
+                <div key={session.id} className="flex items-center justify-between gap-4 p-5">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                      <Icon className="size-5" />
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{session.platform} · {session.location}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{session.lastActive}</p>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate text-sm font-medium text-foreground">{session.userAgent || "Unknown device"}</p>
+                        {session.current && <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-400">Current</span>}
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">Last active {new Date(session.lastActiveAt).toLocaleString()}</p>
+                    </div>
                   </div>
+                  {!session.current && (
+                    <Button type="button" variant="ghost" size="sm" disabled={Boolean(sessionAction)} onClick={() => handleSignOutSession(session.id)}>
+                      {sessionAction === session.id ? "Signing out..." : "Sign out"}
+                    </Button>
+                  )}
                 </div>
-                {!session.current && (
-                  <Button type="button" variant="ghost" size="sm" onClick={() =>handleSignOutSession(session.id)}>
-                    Sign out
-                  </Button>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
       {/* Frontend disclaimer */}
       <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4">
         <p className="text-xs leading-5 text-muted-foreground">
-          Security controls in this demo are simulated on the
-          frontend. A production implementation would connect
-          password changes, two-factor authentication and session
-          management to a secure backend.
+Session management and password changes are connected to the secure backend. Two-factor authentication remains a demo-only control.
         </p>
       </div>
     </div>

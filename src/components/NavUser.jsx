@@ -2,14 +2,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { LogOut, Settings, ChevronRight } from "lucide-react";
 import { logout } from "@/features/auth/authSlice";
+import { logoutCurrentSession } from "@/services/authService";
 
 const NavUser = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login", { replace: true });
+  const handleLogout = async () => {
+    try {
+      await logoutCurrentSession();
+    } catch (error) {
+      if (error.status !== 401) console.error("Server logout failed:", error);
+    } finally {
+      dispatch(logout());
+      navigate("/login", { replace: true });
+    }
   };
 
   const userInfo = useSelector((state) => state.auth.userInfo);
