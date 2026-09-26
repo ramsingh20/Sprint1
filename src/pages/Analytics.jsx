@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { CalendarDays } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
+import ErrorState from "@/components/common/ErrorState";
+import ChartSkeleton from "@/components/common/ChartSkeleton";
 
 import AnalyticsKpiCard from "@/features/analytics/components/AnalyticsKpiCard";
 import AnalyticsRevenueChart from "@/features/analytics/components/AnalyticsRevenueChart";
@@ -11,6 +13,7 @@ import { getAnalyticsRevenue, getAnalyticsStats, getTrafficSources, getUserAcqui
 
 const Analytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
+  const [reloadKey, setReloadKey] = useState(0);
   const [analyticsStats, setAnalyticsStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,7 +50,7 @@ const Analytics = () => {
     };
 
     loadAnalyticsStats();
-  }, []);
+  }, [reloadKey]);
 
   useEffect(() => {
     const loadAnalyticsRevenue = async () => {
@@ -66,7 +69,7 @@ const Analytics = () => {
     };
 
     loadAnalyticsRevenue();
-  }, [selectedPeriod]);
+  }, [selectedPeriod, reloadKey]);
 
   useEffect(() => {
     const loadUserAcquisition = async () => {
@@ -85,7 +88,7 @@ const Analytics = () => {
     };
 
     loadUserAcquisition();
-  }, [selectedPeriod]);
+  }, [selectedPeriod, reloadKey]);
 
   useEffect(() => {
     const loadTrafficSources = async () => {
@@ -111,7 +114,7 @@ const Analytics = () => {
     };
 
     loadTrafficSources();
-  }, [selectedPeriod]);
+  }, [selectedPeriod, reloadKey]);
 
   return (
     <div className="space-y-6 p-6">
@@ -122,7 +125,7 @@ const Analytics = () => {
         <div className="flex items-center gap-2">
           <CalendarDays className="h-4 w-4 text-muted-foreground" />
 
-          <select value={selectedPeriod} onChange={(event) =>setSelectedPeriod(event.target.value)}
+          <select aria-label="Analytics date range" value={selectedPeriod} onChange={(event) =>setSelectedPeriod(event.target.value)}
             className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20"
           >
             <option value="7">Last 7 days</option>
@@ -133,6 +136,7 @@ const Analytics = () => {
         </div>
       </div>
 
+      {error && <ErrorState message={error} onRetry={() => setReloadKey((value) => value + 1)} />}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {analyticsKpiData.map((item) => {
           let value = 0;
@@ -151,9 +155,8 @@ const Analytics = () => {
             <AnalyticsKpiCard
               key={item.title}
               {...item}
-              value={
-                loading ? "Loading..." : item.title === "Conversion Rate" ? `${Number(value).toFixed(1)}%` : value
-              }
+              loading={loading}
+              value={item.title === "Conversion Rate" ? `${Number(value).toFixed(1)}%` : value}
             />
           );
         })}
@@ -162,25 +165,17 @@ const Analytics = () => {
       <div className="grid gap-6 lg:grid-cols-2">
         {
           revenueLoading ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
-              <p className="text-sm text-muted-foreground">Loading revenue data...</p>
-            </div>
+            <ChartSkeleton title="Loading analytics revenue" />
           ) : revenueError ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
-              <p className="text-sm text-destructive">{revenueError}</p>
-            </div>
+            <ErrorState message={revenueError} className="min-h-[300px]" onRetry={() => setReloadKey((value) => value + 1)} />
           ) : (<AnalyticsRevenueChart data={analyticsRevenueData} />)
         }
         
         {
           userAcquisitionLoading ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
-              <p className="text-sm text-muted-foreground">Loading user acquisition data...</p>
-            </div>
+            <ChartSkeleton title="Loading customer acquisition" />
           ) : userAcquisitionError ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
-              <p className="text-sm text-destructive">{userAcquisitionError}</p>
-            </div>
+            <ErrorState message={userAcquisitionError} className="min-h-[300px]" onRetry={() => setReloadKey((value) => value + 1)} />
           ) : (<UserAcquisitionChart data={userAcquisitionData} />)
         }
       </div>
@@ -189,13 +184,9 @@ const Analytics = () => {
         <div>
           {
             trafficSourcesLoading ? (
-              <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
-                <p className="text-sm text-muted-foreground">Loading traffic source data...</p>
-              </div>
+              <ChartSkeleton title="Loading traffic sources" />
             ) : trafficSourcesError ? (
-              <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
-                <p className="text-sm text-destructive">{trafficSourcesError}</p>
-              </div>
+              <ErrorState message={trafficSourcesError} className="min-h-[300px]" onRetry={() => setReloadKey((value) => value + 1)} />
             ) : (<TrafficSourceChart data={trafficSources} />)
           }
         </div>
@@ -206,3 +197,6 @@ const Analytics = () => {
 };
 
 export default Analytics;
+
+
+

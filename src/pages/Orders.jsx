@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Eye, LoaderCircle, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, Search } from "lucide-react";
 import { toast } from "sonner";
 import PageHeader from "@/components/common/PageHeader";
+import DataTableSkeleton from "@/components/common/DataTableSkeleton";
+import EmptyState from "@/components/common/EmptyState";
+import ErrorState from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -115,15 +118,13 @@ const Orders = () => {
         </div>
 
         {error ? (
-          <div className="p-8 text-center">
-            <p role="alert" className="mb-3 text-sm text-destructive">{error}</p>
-            <Button variant="outline" onClick={() => setReloadKey((current) => current + 1)}>Try again</Button>
-          </div>
+          <div className="p-4"><ErrorState message={error} onRetry={() => setReloadKey((current) => current + 1)} /></div>
         ) : loading ? (
-          <div className="flex min-h-56 items-center justify-center gap-2 text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin" />Loading orders...</div>
+          <DataTableSkeleton columns={6} rows={6} />
         ) : (
           <>
-            <Table>
+            <div className="hidden md:block">
+            <Table aria-label="Orders">
               <TableHeader><TableRow>
                 <TableHead>Order</TableHead><TableHead>Customer</TableHead><TableHead>Date</TableHead><TableHead>Amount</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Details</TableHead>
               </TableRow></TableHeader>
@@ -142,10 +143,25 @@ const Orders = () => {
                     <TableCell className="text-right"><Button aria-label={`View ${order.orderId} details`} variant="ghost" size="icon-sm" onClick={() => openDetails(order)}><Eye className="size-4" /></Button></TableCell>
                   </TableRow>
                 ))}
-                {result.orders.length === 0 && <TableRow><TableCell colSpan={6} className="h-32 text-center text-muted-foreground">No orders match your search.</TableCell></TableRow>}
+                {result.orders.length === 0 && <TableRow><TableCell colSpan={6} className="p-0"><EmptyState title="No orders found" description={search || status ? "Try changing the search or status filter." : "Orders will appear here when they are created."} actionLabel={search || status ? "Clear filters" : undefined} onAction={search || status ? () => { setSearch(""); setStatus(""); setPage(1); } : undefined} /></TableCell></TableRow>}
               </TableBody>
             </Table>
-            <div className="flex flex-col gap-3 border-t p-4 sm:flex-row sm:items-center sm:justify-between">
+            </div>
+            <div className="space-y-3 p-3 md:hidden">
+              {result.orders.map((order) => (
+                <article key={`mobile-${order._id}`} className="space-y-3 rounded-lg border p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0"><p className="font-semibold">{order.orderId}</p><p className="truncate text-sm text-muted-foreground">{order.customer?.name || "Unknown customer"}</p></div>
+                    <select aria-label={`Status for ${order.orderId}`} value={order.status} disabled={updatingId === order._id} onChange={(event) => handleStatusChange(order, event.target.value)} className={`max-w-32 rounded-full border-0 px-2 py-1 text-xs font-medium ${statusClass[order.status] || "bg-muted text-muted-foreground"}`}>
+                      {statusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+                    </select>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 text-sm"><span className="text-muted-foreground">{formatDate(order.orderDate)}</span><span className="font-medium">{money(order.amount)}</span></div>
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => openDetails(order)}><Eye className="mr-2 size-4" />View details</Button>
+                </article>
+              ))}
+              {result.orders.length === 0 && <div className="rounded-lg border"><EmptyState title="No orders found" description={search || status ? "Try changing the search or status filter." : "Orders will appear here when they are created."} actionLabel={search || status ? "Clear filters" : undefined} onAction={search || status ? () => { setSearch(""); setStatus(""); setPage(1); } : undefined} /></div>}
+            </div>            <div className="flex flex-col gap-3 border-t p-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">Showing {firstItem}–{lastItem} of {pagination.total} orders</p>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((current) => current - 1)}><ChevronLeft className="mr-1 size-4" />Previous</Button>
@@ -181,6 +197,13 @@ const Orders = () => {
 };
 
 export default Orders;
+
+
+
+
+
+
+
 
 
 

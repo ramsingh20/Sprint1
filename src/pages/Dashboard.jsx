@@ -1,5 +1,8 @@
 import PageHeader from "@/components/common/PageHeader";
+import ErrorState from "@/components/common/ErrorState";
 import ActivityTable from "@/features/dashboard/components/ActivityTable";
+import DataTableSkeleton from "@/components/common/DataTableSkeleton";
+import ChartSkeleton from "@/components/common/ChartSkeleton";
 import RevenueChart from "@/features/dashboard/components/RevenueChart";
 import StatsCard from "@/features/dashboard/components/StatsCard";
 import UserGrowthChart from "@/features/dashboard/components/UserGrowthChart";
@@ -32,6 +35,7 @@ const Dashboard = () => {
   });
   const [customRangeError, setCustomRangeError] = useState("");
   const [dashboardStats, setDashboardStats] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [revenueData, setRevenueData] = useState([]);
@@ -85,7 +89,7 @@ const Dashboard = () => {
     };
     loadDashboardData();
     return () => { active = false; };
-  }, [activeRange]);
+  }, [activeRange, reloadKey]);
 
   const periodLabel = activeRange.period
     ? `the last ${activeRange.period} days`
@@ -131,7 +135,7 @@ const Dashboard = () => {
         <p className="mt-2 text-xs text-muted-foreground">Comparisons use the immediately preceding period of the same length.</p>
       </section>
 
-      {error && <div role="alert" className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
+      {error && <ErrorState message={error} onRetry={() => setReloadKey((value) => value + 1)} />}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statsData.map((stat) => {
@@ -144,29 +148,37 @@ const Dashboard = () => {
             <StatsCard key={stat.key} {...stat}
               value={loading ? "Loading..." : !dashboardStats ? "—" : stat.key === "totalRevenue" ? `$${Number(value).toLocaleString()}` : stat.key === "orderCompletionRate" ? `${Number(value).toFixed(1)}%` : Number(value).toLocaleString()}
               change={loading || !dashboardStats ? "" : formattedChange}
-              description={loading ? "Loading selected range" : "vs previous period"}
+              description={loading ? "" : "vs previous period"}
+              loading={loading}
             />
           );
         })}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {revenueLoading ? <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card"><p className="text-sm text-muted-foreground">Loading revenue data...</p></div>
-          : revenueError ? <div role="alert" className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6"><p className="text-sm text-destructive">{revenueError}</p></div>
+        {revenueLoading ? <ChartSkeleton title="Loading revenue trend" />
+          : revenueError ? <ErrorState message={revenueError} className="min-h-[300px]" onRetry={() => setReloadKey((value) => value + 1)} />
             : <RevenueChart data={revenueData} periodLabel={periodLabel} />}
-        {customerGrowthLoading ? <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card"><p className="text-sm text-muted-foreground">Loading customer growth...</p></div>
-          : customerGrowthError ? <div role="alert" className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6"><p className="text-sm text-destructive">{customerGrowthError}</p></div>
+        {customerGrowthLoading ? <ChartSkeleton title="Loading customer growth" />
+          : customerGrowthError ? <ErrorState message={customerGrowthError} className="min-h-[300px]" onRetry={() => setReloadKey((value) => value + 1)} />
             : <UserGrowthChart data={customerGrowthData} periodLabel={periodLabel} />}
       </div>
 
-      {activityLoading ? <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card"><p className="text-sm text-muted-foreground">Loading recent activity...</p></div>
-        : activityError ? <div role="alert" className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6"><p className="text-sm text-destructive">{activityError}</p></div>
+      {activityLoading ? <DataTableSkeleton columns={5} rows={5} />
+        : activityError ? <ErrorState message={activityError} className="min-h-[300px]" onRetry={() => setReloadKey((value) => value + 1)} />
           : <ActivityTable key={periodLabel} data={activityData} periodLabel={periodLabel} />}
     </div>
   );
 };
 
 export default Dashboard;
+
+
+
+
+
+
+
 
 
 

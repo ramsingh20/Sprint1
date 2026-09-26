@@ -1,7 +1,8 @@
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { Card, Typography } from "@material-tailwind/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const ReportKpiCard = ({ title, value, change, trend, description, }) => {
+const ReportKpiCard = ({ title, value, change, trend, description, loading = false }) => {
   const isPositive = trend === "up";
 
   return (
@@ -11,15 +12,16 @@ const ReportKpiCard = ({ title, value, change, trend, description, }) => {
       </div>
 
       <div className="mt-3 flex items-end justify-between gap-3">
-        <Typography variant="h4" className="font-semibold text-foreground">{value}</Typography>
-        <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+        {loading ? <Skeleton className="h-8 w-28" /> : <Typography variant="h4" className="font-semibold text-foreground">{value}</Typography>}
+        {!loading && <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
           {isPositive ? (<ArrowUpRight className="size-4" />) : (<ArrowDownRight className="size-4" />)}
           {change}
-        </div>
+        </div>}
       </div>
-      <Typography variant="small" className="mt-2 font-normal text-muted-foreground">{description}</Typography>
+      {loading ? <Skeleton className="mt-2 h-4 w-24" /> : <Typography variant="small" className="mt-2 font-normal text-muted-foreground">{description}</Typography>}
     </Card>
   );
 };
 
 export default ReportKpiCard;
+

@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Eye, LoaderCircle, Search, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import PageHeader from "@/components/common/PageHeader";
+import DataTableSkeleton from "@/components/common/DataTableSkeleton";
+import EmptyState from "@/components/common/EmptyState";
+import ErrorState from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -128,12 +131,13 @@ const Customers = () => {
         </div>
 
         {error ? (
-          <div className="p-8 text-center"><p role="alert" className="mb-3 text-sm text-destructive">{error}</p><Button variant="outline" onClick={() => setReloadKey((value) => value + 1)}>Try again</Button></div>
+          <div className="p-4"><ErrorState message={error} onRetry={() => setReloadKey((value) => value + 1)} /></div>
         ) : loading ? (
-          <div className="flex min-h-56 items-center justify-center gap-2 text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin" />Loading customers...</div>
+          <DataTableSkeleton columns={6} rows={6} />
         ) : (
           <>
-            <Table>
+            <div className="hidden md:block">
+            <Table aria-label="Customers">
               <TableHeader><TableRow>
                 <TableHead>Customer</TableHead><TableHead>Customer since</TableHead><TableHead>Orders</TableHead><TableHead>Total spent</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Details</TableHead>
               </TableRow></TableHeader>
@@ -152,10 +156,25 @@ const Customers = () => {
                     <TableCell className="text-right"><Button aria-label={`View ${customer.name} details`} variant="ghost" size="icon-sm" onClick={() => openDetails(customer)}><Eye className="size-4" /></Button></TableCell>
                   </TableRow>
                 ))}
-                {result.customers.length === 0 && <TableRow><TableCell colSpan={6} className="h-32 text-center text-muted-foreground">No customers match your search.</TableCell></TableRow>}
+                {result.customers.length === 0 && <TableRow><TableCell colSpan={6} className="p-0"><EmptyState title="No customers found" description={search || status ? "Try changing the search or status filter." : "Customer accounts will appear here when they register."} actionLabel={search || status ? "Clear filters" : undefined} onAction={search || status ? () => { setSearch(""); setStatus(""); setPage(1); } : undefined} /></TableCell></TableRow>}
               </TableBody>
             </Table>
-            <div className="flex flex-col gap-3 border-t p-4 sm:flex-row sm:items-center sm:justify-between">
+            </div>
+            <div className="space-y-3 p-3 md:hidden">
+              {result.customers.map((customer) => (
+                <article key={`mobile-${customer._id}`} className="space-y-3 rounded-lg border p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0"><p className="truncate font-semibold">{customer.name}</p><p className="truncate text-sm text-muted-foreground">{customer.email}</p></div>
+                    <select aria-label={`Status for ${customer.name}`} value={customer.status} disabled={updatingId === customer._id} onChange={(event) => handleStatusChange(customer, event.target.value)} className={`rounded-full border-0 px-2 py-1 text-xs font-medium ${customer.status === "Active" ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+                      {customerStatuses.map((value) => <option key={value} value={value}>{value}</option>)}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm"><span><span className="block text-xs text-muted-foreground">Orders</span>{customer.orderCount}</span><span><span className="block text-xs text-muted-foreground">Total spent</span>{money(customer.totalSpent)}</span></div>
+                  <div className="flex items-center justify-between gap-3"><span className="text-xs text-muted-foreground">Since {formatDate(customer.createdAt)}</span><Button variant="outline" size="sm" onClick={() => openDetails(customer)}><Eye className="mr-2 size-4" />Details</Button></div>
+                </article>
+              ))}
+              {result.customers.length === 0 && <div className="rounded-lg border"><EmptyState title="No customers found" description={search || status ? "Try changing the search or status filter." : "Customer accounts will appear here when they register."} actionLabel={search || status ? "Clear filters" : undefined} onAction={search || status ? () => { setSearch(""); setStatus(""); setPage(1); } : undefined} /></div>}
+            </div>            <div className="flex flex-col gap-3 border-t p-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">Showing {firstItem}–{lastItem} of {pagination.total} customers</p>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}><ChevronLeft className="mr-1 size-4" />Previous</Button>
@@ -183,7 +202,7 @@ const Customers = () => {
               </dl>
               <div>
                 <h3 className="mb-2 font-medium">Order history</h3>
-                <Table>
+                <Table aria-label="Customer order history">
                   <TableHeader><TableRow><TableHead>Order</TableHead><TableHead>Date</TableHead><TableHead>Amount</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
                   <TableBody>
                     {detail.orders.map((order) => <TableRow key={order._id}><TableCell className="font-medium">{order.orderId}</TableCell><TableCell>{formatDate(order.orderDate)}</TableCell><TableCell>{money(order.amount)}</TableCell><TableCell>{order.status}</TableCell></TableRow>)}
@@ -208,4 +227,11 @@ const Customers = () => {
 };
 
 export default Customers;
+
+
+
+
+
+
+
 

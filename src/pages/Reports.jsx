@@ -2,6 +2,9 @@ import { CalendarDays, Download } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/common/PageHeader";
+import ErrorState from "@/components/common/ErrorState";
+import ChartSkeleton from "@/components/common/ChartSkeleton";
+import DataTableSkeleton from "@/components/common/DataTableSkeleton";
 import ReportKpiCard from "@/features/reports/components/ReportKpiCard";
 import { reportKpiData, } from "@/features/reports/data/reportsData";
 import ReportRevenueChart from "@/features/reports/components/ReportRevenueChart";
@@ -11,6 +14,7 @@ import { getReportRevenue, getReportStats, getReportTable } from "@/services/rep
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30");
+  const [reloadKey, setReloadKey] = useState(0);
   const [search, setSearch] = useState("");
 
   const [reportStats, setReportStats] = useState(null);
@@ -68,7 +72,7 @@ const Reports = () => {
     };
 
     loadReportStats();
-  }, [selectedPeriod]);
+  }, [selectedPeriod, reloadKey]);
 
   useEffect(() => {
     const loadReportRevenue = async () => {
@@ -87,7 +91,7 @@ const Reports = () => {
     };
 
     loadReportRevenue();
-  }, [selectedPeriod]);
+  }, [selectedPeriod, reloadKey]);
 
   useEffect(() => {
     const loadReportTable = async () => {
@@ -106,7 +110,7 @@ const Reports = () => {
     };
 
     loadReportTable();
-  }, [selectedPeriod]);
+  }, [selectedPeriod, reloadKey]);
 
   return (
     <div className="space-y-6">
@@ -116,6 +120,8 @@ const Reports = () => {
           <div className="flex items-center gap-2">
             <CalendarDays className="size-4 text-muted-foreground" />
             <select
+              id="reports-period"
+              aria-label="Reports date range"
               value={selectedPeriod}
               onChange={(event) =>setSelectedPeriod(event.target.value)}
               className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20"
@@ -150,37 +156,26 @@ const Reports = () => {
 
           return (
             <ReportKpiCard key={item.title} {...item}
-              value={ reportStatsLoading ? "Loading...": item.title === "Total Revenue" || item.title === "Average Order Value" ? `$${Number(value).toLocaleString()}` : value}
+              loading={reportStatsLoading}
+              value={ item.title === "Total Revenue" || item.title === "Average Order Value" ? `$${Number(value).toLocaleString()}` : value}
             />
           );
         })}
       </div>
-      {reportStatsError && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-          <p className="text-sm text-destructive">{reportStatsError}</p>
-        </div>
-      )}
+      {reportStatsError && <ErrorState message={reportStatsError} onRetry={() => setReloadKey((value) => value + 1)} />}
       <div className="grid gap-6">
         {
           reportRevenueLoading ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
-              <p className="text-sm text-muted-foreground">Loading report revenue...</p>
-            </div>
+            <ChartSkeleton title="Loading report revenue" />
           ) : reportRevenueError ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
-              <p className="text-sm text-destructive">{reportRevenueError}</p>
-            </div>
+            <ErrorState message={reportRevenueError} className="min-h-[300px]" onRetry={() => setReloadKey((value) => value + 1)} />
           ) : (<ReportRevenueChart data={reportRevenue} />)
         }
         {
           reportTableLoading ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card">
-              <p className="text-sm text-muted-foreground">Loading report data...</p>
-            </div>
+            <DataTableSkeleton columns={5} rows={6} />
           ) : reportTableError ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-xl border bg-card p-6">
-              <p className="text-sm text-destructive">{reportTableError}</p>
-            </div>
+            <ErrorState message={reportTableError} className="min-h-[300px]" onRetry={() => setReloadKey((value) => value + 1)} />
           ) : (<ReportTable data={reportTableData} search={search} onSearchChange={setSearch} />)
         }
       </div>
@@ -189,3 +184,6 @@ const Reports = () => {
 };
 
 export default Reports;
+
+
+

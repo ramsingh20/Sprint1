@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
 import { Card, Typography } from "@material-tailwind/react";
 const ITEMS_PER_PAGE = 6;
@@ -7,16 +8,14 @@ const ITEMS_PER_PAGE = 6;
 const ReportTable = ({ data, search, onSearchChange }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data]);
 
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(data.length / ITEMS_PER_PAGE));
+  const visiblePage = Math.min(currentPage, totalPages);
   const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const startIndex = (visiblePage - 1) * ITEMS_PER_PAGE;
 
     return data.slice( startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [data, currentPage]);
+  }, [data, visiblePage]);
 
   const formatCurrency = (value) => {return `$${value.toLocaleString()}`;};
 
@@ -38,6 +37,7 @@ const ReportTable = ({ data, search, onSearchChange }) => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
+            aria-label="Search report rows by date"
             type="text"
             placeholder="Search reports..."
             value={search}
@@ -47,7 +47,7 @@ const ReportTable = ({ data, search, onSearchChange }) => {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <Table>
+        <Table aria-label="Report details">
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
@@ -77,9 +77,7 @@ const ReportTable = ({ data, search, onSearchChange }) => {
 
             {paginatedData.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
-                  No reports found.
-                </TableCell>
+                <TableCell colSpan={5} className="p-0"><EmptyState title="No report rows" description={search ? "Try a different date search." : "No report activity is available for this period."} actionLabel={search ? "Clear search" : undefined} onAction={search ? () => onSearchChange("") : undefined} /></TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -100,7 +98,7 @@ const ReportTable = ({ data, search, onSearchChange }) => {
             Previous
           </button>
 
-          <span className="text-sm text-muted-foreground">Page {currentPage} of {totalPages || 1}</span>
+          <span className="text-sm text-muted-foreground">Page {visiblePage} of {totalPages}</span>
           <button
             type="button"
             disabled={ currentPage === totalPages || totalPages === 0}
@@ -116,3 +114,6 @@ const ReportTable = ({ data, search, onSearchChange }) => {
 };
 
 export default ReportTable;
+
+
+

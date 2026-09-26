@@ -99,14 +99,14 @@ const ActivityTable = ({ data, periodLabel }) => {
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
-                    <input type="text" placeholder="Search transactions..." value={search} onChange={(event) => {setSearch(event.target.value); setCurrentPage(1)}} className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 sm:w-64" />
+                    <input aria-label="Search recent activity" type="text" placeholder="Search transactions..." value={search} onChange={(event) => {setSearch(event.target.value); setCurrentPage(1)}} className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 sm:w-64" />
                 </div>
 
                 {/* Status */}
                 <div className="relative">
                     <SlidersHorizontal className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
-                    <select value={status} onChange={(event) => {setStatus(event.target.value); setCurrentPage(1)}} className="h-9 w-full appearance-none rounded-md border border-input bg-background pl-9 pr-8 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 sm:w-36">
+                    <select aria-label="Filter recent activity by status" value={status} onChange={(event) => {setStatus(event.target.value); setCurrentPage(1)}} className="h-9 w-full appearance-none rounded-md border border-input bg-background pl-9 pr-8 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20 sm:w-36">
                         <option value="All">All Status</option>
                         <option value="Completed">Completed</option>
                         <option value="Pending">Pending</option>
@@ -121,7 +121,7 @@ const ActivityTable = ({ data, periodLabel }) => {
         </div>
 
         <div className="overflow-x-auto">
-            <Table>
+            <Table aria-label="Recent order activity">
             <TableHeader>
                 <TableRow>
                 <TableHead>
@@ -209,5 +209,6 @@ const ActivityTable = ({ data, periodLabel }) => {
 };
 
 export default ActivityTable;
+
 
 
