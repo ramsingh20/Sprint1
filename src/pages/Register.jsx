@@ -1,5 +1,5 @@
 // src/pages/Register.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { Input, Button, Typography, Card } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../features/auth/authSlice";

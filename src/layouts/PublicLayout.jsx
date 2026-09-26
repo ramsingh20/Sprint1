@@ -1,6 +1,5 @@
 import Footer from '@/components/Footer'
 import SimpleNavbar from '@/components/SimpleNavbar'
-import React from 'react'
 import { Outlet } from 'react-router-dom'
 
 const PublicLayout = () => {
