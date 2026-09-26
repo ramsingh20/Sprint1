@@ -1,32 +1,19 @@
 import { apiRequest } from "@/services/api";
 
-export const getDashboardStats = async () => {
-  const data = await apiRequest("/dashboard/stats", {
-    method: "GET",
-  });
-
-  return data.stats;
+const buildRangeQuery = ({ period, startDate, endDate } = {}) => {
+  const params = new URLSearchParams();
+  if (startDate && endDate) {
+    params.set("startDate", startDate);
+    params.set("endDate", endDate);
+  } else {
+    params.set("period", String(period || 30));
+  }
+  return params.toString();
 };
 
-export const getRevenueData = async () => {
-  const data = await apiRequest("/dashboard/revenue", {
-    method: "GET",
-  });
+const getDashboardData = async (path, range) => apiRequest(`/dashboard/${path}?${buildRangeQuery(range)}`, { method: "GET" });
 
-  return data.revenue;
-};
-export const getUserGrowthData = async () => {
-  const data = await apiRequest("/dashboard/user-growth", {
-    method: "GET",
-  });
-
-  return data.userGrowth;
-};
-
-export const getRecentActivity = async () => {
-  const data = await apiRequest("/dashboard/activity", {
-    method: "GET",
-  });
-
-  return data.activities;
-};
+export const getDashboardStats = async (range) => (await getDashboardData("stats", range)).stats;
+export const getRevenueData = async (range) => (await getDashboardData("revenue", range)).revenue;
+export const getUserGrowthData = async (range) => (await getDashboardData("user-growth", range)).userGrowth;
+export const getRecentActivity = async (range) => (await getDashboardData("activity", range)).activities;

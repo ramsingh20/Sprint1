@@ -9,7 +9,13 @@ const statusStyles = {
   Failed: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
 };
 
-const ActivityTable = ({ data }) => {
+const SortIcon = ({ column, sortConfig }) => {
+    if (sortConfig.key !== column) return <ArrowUpDown className="ml-1 h-3.5 w-3.5" />;
+    return sortConfig.direction === "asc"
+        ? <ArrowUp className="ml-1 h-3.5 w-3.5" />
+        : <ArrowDown className="ml-1 h-3.5 w-3.5" />;
+};
+const ActivityTable = ({ data, periodLabel }) => {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState("All");
     const [sortConfig, setSortConfig] = useState({ 
@@ -65,15 +71,8 @@ const ActivityTable = ({ data }) => {
             return { key, direction: "asc",};
         });
     };
-    const SortIcon = ({ column }) => {
-        if (sortConfig.key !== column) {
-            return <ArrowUpDown className="ml-1 h-3.5 w-3.5" />;
-        }
 
-        return sortConfig.direction === "asc" ? (<ArrowUp className="ml-1 h-3.5 w-3.5" />) : (<ArrowDown className="ml-1 h-3.5 w-3.5" />);
-    };
-
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
 
     const paginatedData = useMemo(() => {
         const startIndex = (currentPage - 1) * rowsPerPage;
@@ -91,7 +90,7 @@ const ActivityTable = ({ data }) => {
                 </Typography>
 
                 <Typography variant="small" className="mt-1 font-normal text-muted-foreground">
-                    Recent transactions from your customers.
+                    Recent transactions during {periodLabel}.
                 </Typography>
             </div>
 
@@ -127,23 +126,23 @@ const ActivityTable = ({ data }) => {
                 <TableRow>
                 <TableHead>
                     <button type="button" onClick={() => handleSort("id")} className="inline-flex items-center font-medium hover:text-foreground">
-                        Transaction <SortIcon column="id" />
+                        Transaction <SortIcon column="id" sortConfig={sortConfig} />
                     </button>
                 </TableHead>
                 <TableHead>
                     <button type="button" onClick={() => handleSort("customer")} className="inline-flex items-center font-medium hover:text-foreground">
-                        Customer<SortIcon column="customer" />
+                        Customer<SortIcon column="customer" sortConfig={sortConfig} />
                     </button>
                 </TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>
                     <button type="button" onClick={() => handleSort("date")} className="inline-flex items-center font-medium hover:text-foreground">
-                        Date<SortIcon column="date" />
+                        Date<SortIcon column="date" sortConfig={sortConfig} />
                     </button>
                 </TableHead>
                 <TableHead className="text-right">
                     <button type="button" onClick={() => handleSort("amount")} className="ml-auto inline-flex items-center font-medium hover:text-foreground">
-                        Amount <SortIcon column="amount" />
+                        Amount <SortIcon column="amount" sortConfig={sortConfig} />
                     </button>
                 </TableHead>
                 </TableRow>
@@ -167,7 +166,7 @@ const ActivityTable = ({ data }) => {
                     </span>
                     </TableCell>
 
-                    <TableCell className="text-muted-foreground">{item.date}</TableCell>
+                    <TableCell className="text-muted-foreground">{new Date(item.date).toLocaleDateString()}</TableCell>
 
                     <TableCell className="text-right font-medium">{item.amount}</TableCell>
                 </TableRow>
@@ -210,3 +209,5 @@ const ActivityTable = ({ data }) => {
 };
 
 export default ActivityTable;
+
+
