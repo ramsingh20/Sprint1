@@ -1,7 +1,8 @@
 import { logout } from "@/features/auth/authSlice";
 import { store } from "@/store/store";
 
-const API_BASE_URL = "http://localhost:3000/api";
+const configuredApiUrl = import.meta.env.VITE_API_URL;
+const API_BASE_URL = (configuredApiUrl || "http://localhost:3000/api").replace(/\/+$/, "");
 
 export const apiRequest = async (endpoint, options = {}) => {
   const token = localStorage.getItem("token");
@@ -34,9 +35,7 @@ export const apiRequest = async (endpoint, options = {}) => {
     const error = new Error(
       data.message || "Something went wrong"
     );
-
     error.status = response.status;
-
     throw error;
   }
 

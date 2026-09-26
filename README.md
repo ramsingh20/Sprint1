@@ -1,3 +1,8 @@
+## Local development configuration
+
+Copy `.env.example` to `.env` and set the frontend values for your environment. `VITE_API_URL` includes the API prefix (for example `http://localhost:3000/api`); a same-origin reverse proxy can use `/api`. `VITE_BASE_PATH` defaults to `/Sprint1/` to preserve the existing GitHub Pages deployment and can be `/` for a root-domain deployment. Vite embeds these values in the client bundle, so never put secrets in frontend environment variables.
+
+See `../PulseBoardBackend/README.md` for backend setup, database configuration, CORS, and production deployment requirements. The original roadmap and project overview are retained below.
 🔥 Then we continue with the original feature roadmap
 After Reports is stable, we are NOT finished.
 The next major stages will be:
