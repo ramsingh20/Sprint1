@@ -157,7 +157,7 @@ const Reports = () => {
           return (
             <ReportKpiCard key={item.title} {...item}
               loading={reportStatsLoading}
-              value={ item.title === "Total Revenue" || item.title === "Average Order Value" ? `$${Number(value).toLocaleString()}` : value}
+              value={ item.title === "Total Revenue" || item.title === "Average Order Value" ? `₹${Number(value).toLocaleString()}` : value}
             />
           );
         })}

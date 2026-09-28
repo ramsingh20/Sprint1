@@ -1,6 +1,6 @@
 import { Card, CardBody, Typography, } from "@material-tailwind/react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip,XAxis, YAxis, } from "recharts";
-const formatCurrency = (value) => {return `$${value.toLocaleString()}`;};
+const formatCurrency = (value) => {return `₹${value.toLocaleString()}`;};
 
 const ReportRevenueChart = ({ data }) => {
   return (

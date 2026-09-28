@@ -85,9 +85,7 @@ const ActivityTable = ({ data, periodLabel }) => {
     <Card className="overflow-hidden border border-border bg-card text-card-foreground shadow-sm">
         <div className="flex flex-col gap-4 p-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-                <Typography variant="h6" className="font-semibold">
-                    Recent Activity
-                </Typography>
+                <Typography variant="h6" className="font-semibold">Recent Activity</Typography>
 
                 <Typography variant="small" className="mt-1 font-normal text-muted-foreground">
                     Recent transactions during {periodLabel}.
@@ -187,21 +185,15 @@ const ActivityTable = ({ data, periodLabel }) => {
             </p>
 
             <div className="flex items-center gap-2">
-                <button type="button" disabled={currentPage === 1} onClick={() =>
-                    setCurrentPage((page) => page - 1)
-                }
+                <button type="button" disabled={currentPage === 1} onClick={() =>setCurrentPage((page) => page - 1)}
                 className="rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
                 >Previous</button>
 
                 <span className="text-sm text-muted-foreground">Page {currentPage} of {totalPages}</span>
 
-                <button type="button" disabled={currentPage === totalPages} onClick={() =>
-                    setCurrentPage((page) => page + 1)
-                }
+                <button type="button" disabled={currentPage === totalPages} onClick={() =>setCurrentPage((page) => page + 1)}
                 className="rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
-                >
-                Next
-                </button>
+                >Next</button>
             </div>
         </div>
     </Card>

@@ -146,7 +146,7 @@ const Dashboard = () => {
             : formatPercentChange(change === undefined ? 0 : change);
           return (
             <StatsCard key={stat.key} {...stat}
-              value={loading ? "Loading..." : !dashboardStats ? "—" : stat.key === "totalRevenue" ? `$${Number(value).toLocaleString()}` : stat.key === "orderCompletionRate" ? `${Number(value).toFixed(1)}%` : Number(value).toLocaleString()}
+              value={loading ? "Loading..." : !dashboardStats ? "—" : stat.key === "totalRevenue" ? `₹${Number(value).toLocaleString()}` : stat.key === "orderCompletionRate" ? `${Number(value).toFixed(1)}%` : Number(value).toLocaleString()}
               change={loading || !dashboardStats ? "" : formattedChange}
               description={loading ? "" : "vs previous period"}
               loading={loading}

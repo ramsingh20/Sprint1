@@ -17,7 +17,7 @@ const ReportTable = ({ data, search, onSearchChange }) => {
     return data.slice( startIndex, startIndex + ITEMS_PER_PAGE);
   }, [data, visiblePage]);
 
-  const formatCurrency = (value) => {return `$${value.toLocaleString()}`;};
+  const formatCurrency = (value) => {return `₹${value.toLocaleString()}`;};
 
   const getAverageOrderValue = (item) => {
     return item.orders > 0 ? item.revenue / item.orders : 0;

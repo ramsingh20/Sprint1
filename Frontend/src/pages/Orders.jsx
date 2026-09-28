@@ -16,7 +16,7 @@ import {
 import { getOrder, getOrders, updateOrderStatus } from "@/services/ordersService";
 
 const statusOptions = ["Pending", "Completed", "Failed"];
-const money = (amount) => `$${Number(amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const money = (amount) => `₹${Number(amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const formatDate = (date) => new Date(date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 
 const statusClass = {

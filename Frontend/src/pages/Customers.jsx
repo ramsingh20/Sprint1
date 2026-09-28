@@ -16,7 +16,7 @@ import {
 import { getCustomer, getCustomers, updateCustomerStatus } from "@/services/customersService";
 
 const customerStatuses = ["Active", "Inactive"];
-const money = (amount) => `$${Number(amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const money = (amount) => `₹${Number(amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const formatDate = (date) => date ? new Date(date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—";
 
 const Customers = () => {
