@@ -1,4 +1,5 @@
 import e from "express";
+import { createServer } from "node:http";
 import mongoose from "mongoose";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
@@ -9,6 +10,7 @@ import reportsRoutes from "./routes/reportsRoutes.js";
 import ordersRoutes from "./routes/ordersRoutes.js";
 import customersRoutes from "./routes/customersRoutes.js";
 import dotenv from "dotenv";
+import { initializeSocketServer } from "./services/socketService.js";
 dotenv.config();
 
 const requiredEnvironment = ["MONGO_URI", "JWT_SECRET"];
@@ -46,9 +48,12 @@ app.use("/api/reports", reportsRoutes);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/customers", customersRoutes);
 
+const httpServer = createServer(app);
+initializeSocketServer(httpServer, allowedOrigins);
+
 const startServer = async () => {
   await mongoose.connect(process.env.MONGO_URI);
-  app.listen(port, () => console.log(`PulseBoard API listening on port ${port}`));
+  httpServer.listen(port, () => console.log(`PulseBoard API and Socket.IO listening on port ${port}`));
 };
 startServer().catch((error) => {
   console.error("Unable to start PulseBoard API:", error.message);
