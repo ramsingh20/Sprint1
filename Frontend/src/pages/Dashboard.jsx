@@ -127,13 +127,40 @@ const Dashboard = () => {
       }
     };
 
+    const handleConnect = () => {
+      console.info("Dashboard Socket.IO connected");
+    };
+    const handleDisconnect = (reason) => {
+      console.warn("Dashboard Socket.IO disconnected:", reason);
+    };
+    const handleConnectError = (connectError) => {
+      console.error("Dashboard Socket.IO connection error:", connectError.message);
+    };
+    const handleReconnectAttempt = (attempt) => {
+      console.info("Dashboard Socket.IO reconnect attempt:", attempt);
+    };
+    const handleReconnect = () => {
+      console.info("Dashboard Socket.IO reconnected; refreshing dashboard data");
+      refreshOrderRelatedData();
+    };
+
     socket.on("order:created", refreshOrderRelatedData);
     socket.on("order:status-updated", refreshOrderRelatedData);
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleConnectError);
+    socket.io.on("reconnect_attempt", handleReconnectAttempt);
+    socket.io.on("reconnect", handleReconnect);
 
     return () => {
       active = false;
       socket.off("order:created", refreshOrderRelatedData);
       socket.off("order:status-updated", refreshOrderRelatedData);
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleConnectError);
+      socket.io.off("reconnect_attempt", handleReconnectAttempt);
+      socket.io.off("reconnect", handleReconnect);
     };
   }, [activeRange]);
 

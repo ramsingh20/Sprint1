@@ -6,6 +6,7 @@ apiUrl.pathname = apiUrl.pathname.replace(/\/api\/?$/, "") || "/";
 
 export const socket = io(apiUrl.origin, {
   autoConnect: false,
+  reconnection: true,
 });
 
 export const connectSocket = () => {
