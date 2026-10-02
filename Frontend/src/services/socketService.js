@@ -7,9 +7,17 @@ apiUrl.pathname = apiUrl.pathname.replace(/\/api\/?$/, "") || "/";
 export const socket = io(apiUrl.origin, {
   autoConnect: false,
   reconnection: true,
+  auth: (callback) => {
+    const token = localStorage.getItem("token");
+    callback(token ? { token } : {});
+  },
 });
 
 export const connectSocket = () => {
+  if (!localStorage.getItem("token")) {
+    socket.disconnect();
+    return socket;
+  }
   if (!socket.connected) socket.connect();
   return socket;
 };

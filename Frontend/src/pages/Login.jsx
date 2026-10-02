@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input, Button, Typography, Card } from "@material-tailwind/react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { setUser } from "../features/auth/authSlice";
+import { connectSocket } from "../services/socketService";
 import { useDispatch } from "react-redux";
 
 export default function Login() {
@@ -46,6 +47,7 @@ export default function Login() {
               throw new Error(data.message || "Login failed");
             }
             localStorage.setItem("token", data.token);      // Store JWT
+            connectSocket();
             
             dispatch(setUser(data.Ruser))   // Store user information
             // navigate('/dashboard')

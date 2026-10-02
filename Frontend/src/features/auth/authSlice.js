@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { disconnectSocket } from "../../services/socketService.js";
 
 const storedUser = localStorage.getItem("userInfo");
 const initialState = {userInfo: storedUser ? JSON.parse(storedUser) : null,};
@@ -15,6 +16,7 @@ const authSlice = createSlice({
     },
 
     logout: (state) => {
+      disconnectSocket();
       state.userInfo = null;
       localStorage.removeItem("userInfo");
       localStorage.removeItem("token");

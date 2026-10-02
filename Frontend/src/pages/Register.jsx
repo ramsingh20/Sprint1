@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input, Button, Typography, Card } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../features/auth/authSlice";
+import { connectSocket } from "../services/socketService";
 import { useDispatch } from "react-redux";
 
 export default function Register() {
@@ -42,6 +43,7 @@ export default function Register() {
         throw new Error(data.message || "Registration failed");
       }
       localStorage.setItem("token", data.token);
+      connectSocket();
 
       dispatch(setUser(data.user));
 
