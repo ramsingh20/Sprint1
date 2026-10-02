@@ -49,7 +49,7 @@ app.use("/api/orders", ordersRoutes);
 app.use("/api/customers", customersRoutes);
 
 const httpServer = createServer(app);
-initializeSocketServer(httpServer, allowedOrigins);
+app.set("io", initializeSocketServer(httpServer, allowedOrigins));
 
 const startServer = async () => {
   await mongoose.connect(process.env.MONGO_URI);
