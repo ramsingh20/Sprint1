@@ -8,6 +8,7 @@ import StatsCard from "@/features/dashboard/components/StatsCard";
 import UserGrowthChart from "@/features/dashboard/components/UserGrowthChart";
 import { statsData } from "@/features/dashboard/data/dashboardData";
 import { getDashboardStats, getRecentActivity, getRevenueData, getUserGrowthData } from "@/services/dashboardService";
+import { socket } from "@/services/socketService";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -90,6 +91,51 @@ const Dashboard = () => {
     loadDashboardData();
     return () => { active = false; };
   }, [activeRange, reloadKey]);
+
+  useEffect(() => {
+    let active = true;
+    const refreshOrderRelatedData = async () => {
+      setLoading(true);
+      setRevenueLoading(true);
+      setActivityLoading(true);
+      setError("");
+      setRevenueError("");
+      setActivityError("");
+
+      try {
+        const [stats, revenue, activity] = await Promise.all([
+          getDashboardStats(activeRange),
+          getRevenueData(activeRange),
+          getRecentActivity(activeRange),
+        ]);
+        if (!active) return;
+        setDashboardStats(stats);
+        setRevenueData(revenue);
+        setActivityData(activity);
+      } catch (loadError) {
+        if (!active) return;
+        const message = loadError.message || "Failed to refresh dashboard data";
+        setError(message);
+        setRevenueError(message);
+        setActivityError(message);
+      } finally {
+        if (active) {
+          setLoading(false);
+          setRevenueLoading(false);
+          setActivityLoading(false);
+        }
+      }
+    };
+
+    socket.on("order:created", refreshOrderRelatedData);
+    socket.on("order:status-updated", refreshOrderRelatedData);
+
+    return () => {
+      active = false;
+      socket.off("order:created", refreshOrderRelatedData);
+      socket.off("order:status-updated", refreshOrderRelatedData);
+    };
+  }, [activeRange]);
 
   const periodLabel = activeRange.period
     ? `the last ${activeRange.period} days`
