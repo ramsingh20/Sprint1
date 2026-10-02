@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import User from "../models/user.js";
 
 let socketServer;
 
@@ -11,16 +12,32 @@ export const initializeSocketServer = (httpServer, allowedOrigins) => {
     },
   });
 
-  socketServer.use((socket, next) => {
+  socketServer.use(async (socket, next) => {
     const token = socket.handshake.auth?.token;
     if (typeof token !== "string" || !token.trim()) {
       return next(new Error("Authentication required"));
     }
 
+    let decoded;
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      if (!decoded.id || !decoded.sid) {
-        return next(new Error("Invalid authentication token"));
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      const message = error.name === "TokenExpiredError"
+        ? "Authentication token expired"
+        : "Invalid authentication token";
+      return next(new Error(message));
+    }
+
+    if (!decoded.id || !decoded.sid) {
+      return next(new Error("Invalid authentication token"));
+    }
+
+    try {
+      const user = await User.findById(decoded.id).select("sessions").lean();
+      const session = user?.sessions?.find((item) => item.sid === decoded.sid);
+      const expiresAt = session ? new Date(session.expiresAt).getTime() : NaN;
+      if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+        return next(new Error("Invalid or expired session"));
       }
 
       socket.user = {
@@ -29,11 +46,8 @@ export const initializeSocketServer = (httpServer, allowedOrigins) => {
         sid: String(decoded.sid),
       };
       return next();
-    } catch (error) {
-      const message = error.name === "TokenExpiredError"
-        ? "Authentication token expired"
-        : "Invalid authentication token";
-      return next(new Error(message));
+    } catch {
+      return next(new Error("Unable to validate socket session"));
     }
   });
 
