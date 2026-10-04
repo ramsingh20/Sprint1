@@ -14,6 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { getCustomer, getCustomers, updateCustomerStatus } from "@/services/customersService";
+import { socket } from "@/services/socketService";
 
 const customerStatuses = ["Active", "Inactive"];
 const money = (amount) => `₹${Number(amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -58,6 +59,16 @@ const Customers = () => {
     load();
     return () => { active = false; };
   }, [page, debouncedSearch, status, reloadKey]);
+  useEffect(() => {
+    const refreshCustomers = () => setReloadKey((value) => value + 1);
+    socket.on("order:created", refreshCustomers);
+    socket.on("order:status-updated", refreshCustomers);
+
+    return () => {
+      socket.off("order:created", refreshCustomers);
+      socket.off("order:status-updated", refreshCustomers);
+    };
+  }, []);
 
   useEffect(() => {
     if (!detailsOpen || !selectedCustomer?._id) return undefined;
@@ -76,7 +87,7 @@ const Customers = () => {
     };
     loadDetails();
     return () => { active = false; };
-  }, [detailsOpen, selectedCustomer?._id, detailPage]);
+  }, [detailsOpen, selectedCustomer?._id, detailPage, reloadKey]);
 
   const handleStatusChange = async (customer, nextStatus) => {
     if (customer.status === nextStatus) return;

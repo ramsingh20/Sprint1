@@ -14,6 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { getOrder, getOrders, updateOrderStatus } from "@/services/ordersService";
+import { socket } from "@/services/socketService";
 
 const statusOptions = ["Pending", "Completed", "Failed"];
 const money = (amount) => `₹${Number(amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -61,6 +62,35 @@ const Orders = () => {
     load();
     return () => { active = false; };
   }, [page, debouncedSearch, status, reloadKey]);
+  useEffect(() => {
+    const refreshOrders = () => setReloadKey((current) => current + 1);
+    socket.on("order:created", refreshOrders);
+    socket.on("order:status-updated", refreshOrders);
+
+    return () => {
+      socket.off("order:created", refreshOrders);
+      socket.off("order:status-updated", refreshOrders);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedOrder?._id) return undefined;
+    let active = true;
+    const loadDetails = async () => {
+      setDetailLoading(true);
+      setDetailError("");
+      try {
+        const data = await getOrder(selectedOrder._id);
+        if (active) setSelectedOrder(data.order);
+      } catch (detailLoadError) {
+        if (active) setDetailError(detailLoadError.message || "Unable to load order details.");
+      } finally {
+        if (active) setDetailLoading(false);
+      }
+    };
+    loadDetails();
+    return () => { active = false; };
+  }, [selectedOrder?._id, reloadKey]);
 
   const handleSearch = (event) => { setSearch(event.target.value); setPage(1); };
   const handleStatusFilter = (event) => { setStatus(event.target.value); setPage(1); };
@@ -81,18 +111,9 @@ const Orders = () => {
     }
   };
 
-  const openDetails = async (order) => {
+  const openDetails = (order) => {
     setSelectedOrder(order);
-    setDetailLoading(true);
     setDetailError("");
-    try {
-      const data = await getOrder(order._id);
-      setSelectedOrder(data.order);
-    } catch (detailLoadError) {
-      setDetailError(detailLoadError.message || "Unable to load order details.");
-    } finally {
-      setDetailLoading(false);
-    }
   };
 
   const pagination = result.pagination;
