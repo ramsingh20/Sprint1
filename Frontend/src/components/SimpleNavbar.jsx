@@ -6,157 +6,144 @@ import {
   Collapse,
   Navbar,
   Input,
-  Avatar,
-  Menu,
 } from "@material-tailwind/react";
 import {
-  Archive,
-  HeadsetHelp,
   Home,
   InfoCircle,
-  LogOut,
   Menu as MenuIcon,
-  // MultiplePages,
-  // ProfileCircle,
   Search,
-  // SelectFace3d,
-  Settings,
-  UserCircle,
   Xmark,
+  Spark,
 } from "iconoir-react";
+import { Link } from "react-router-dom";
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
-import { Link, NavLink } from "react-router-dom";
-import { Moon, ShoppingBasket, Sun } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../features/auth/authSlice";
+import { useSelector } from "react-redux";
 
 const LINKS = [
-  {
-    icon: Home,
-    title: "Home",
-    path: "/",
-  },
-  {
-    icon: ShoppingBasket,
-    title: "Products",
-    path: "/products",
-  },
-  {
-    icon: Archive,
-    title: "Categories",
-    path: "/categories",
-  },
-  {
-    icon: InfoCircle,
-    title: "About",
-    path: "/about",
-  },
+  { icon: Home, title: "Overview", href: "#overview" },
+  { icon: Spark, title: "Features", href: "#features" },
+  { icon: Spark, title: "Modules", href: "#modules" },
+  { icon: InfoCircle, title: "About", href: "#about" },
 ];
 
-function NavList() {
+function NavList({ mobile = false, onNavigate }) {
   return (
-    <ul className="mt-4 flex flex-col gap-x-3 gap-y-1.5 lg:mt-0 lg:flex-row lg:items-center">
-      {LINKS.map(({ icon: Icon, title, path }) => (
+    <ul
+      className={
+        mobile
+          ? "mt-4 flex flex-col gap-y-2"
+          : "flex items-center gap-x-5"
+      }
+    >
+      {LINKS.map(({ icon: Icon, title, href }) => (
         <li key={title}>
-          <NavLink
-            to={path}
-            type="small"
-            className={({ isActive }) =>`flex items-center gap-x-2 p-1 ${ isActive ? "text-primary font-semibold" : "hover:text-primary"}`}
+          <a
+            href={href}
+            onClick={onNavigate}
+            className={`flex items-center gap-x-2 transition-colors ${
+              mobile
+                ? "rounded-lg px-3 py-2 hover:bg-surface-container"
+                : "p-1 hover:text-primary"
+            }`}
           >
             <Icon className="h-4 w-4" />
             {title}
-          </NavLink>
+          </a>
         </li>
       ))}
     </ul>
   );
 }
 
-function ProfileMenu() {
-  const dispatch = useDispatch();
-
-  const handleLogOut = () => {
-    dispatch(logout())
-    localStorage.removeItem('userInfo')
-  }
-  
-  return (
-    <Menu>
-      <Menu.Trigger
-        as={Avatar}
-        src="https://raw.githubusercontent.com/creativetimofficial/public-assets/master/ct-assets/team-4.jpg"
-        alt="profile-picture"
-        size="sm"
-        className="border border-primary p-0.5 lg:ml-4"
-      />
-      <Menu.Content>
-        <Menu.Item>
-          <UserCircle className="mr-2 h-[18px] w-[18px]" /> My Profile
-        </Menu.Item>
-        <Menu.Item>
-          <Settings className="mr-2 h-[18px] w-[18px]" /> Edit Profile
-        </Menu.Item>
-        <Menu.Item>
-          <HeadsetHelp className="mr-2 h-[18px] w-[18px]" /> Support
-        </Menu.Item>
-        <hr className="!my-1 -mx-1 border-surface" />
-        <Menu.Item onClick={handleLogOut} className="text-error hover:bg-error/10 hover:text-error focus:bg-error/10 focus:text-error">
-          <LogOut className="mr-2 h-[18px] w-[18px]" />
-          Logout
-        </Menu.Item>
-      </Menu.Content>
-    </Menu>
-  );
-}
-
 export default function SimpleNavbar() {
-    const { darkMode, toggleTheme } = useTheme();
+  const { darkMode, toggleTheme } = useTheme();
   const [openNav, setOpenNav] = React.useState(false);
-
-  const { userInfo } = useSelector((state) => state.auth)
+  const { userInfo } = useSelector((state) => state.auth);
 
   React.useEffect(() => {
-    window.addEventListener(
-      "resize",
-      () => window.innerWidth >= 960 && setOpenNav(false),
-    );
+    const handleResize = () => {
+      if (window.innerWidth >= 960) {
+        setOpenNav(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const closeMobileNav = () => setOpenNav(false);
+
   return (
-    <Navbar className="mx-auto w-full max-w-screen-xl">
-      <div className="flex items-center">
-        <Typography
-          as="a"
-          href="#"
-          type="small"
-          className="ml-2 mr-2 block py-1 font-semibold"
+    <Navbar className="mx-auto w-full max-w-screen-xl border border-surface/60">
+      <div className="flex items-center gap-2">
+        <Link
+          to="/"
+          onClick={closeMobileNav}
+          className="shrink-0"
+          aria-label="PulseBoard home"
         >
-          Material Tailwind
-        </Typography>
+          <Typography
+            as="span"
+            type="small"
+            className="block py-1 text-base font-bold tracking-tight"
+          >
+            Pulse<span className="text-primary">Board</span>
+          </Typography>
+        </Link>
+
         <hr className="ml-1 mr-1.5 hidden h-5 w-px border-l border-t-0 border-secondary-dark lg:block" />
+
         <div className="hidden lg:block">
           <NavList />
-          
         </div>
-        <div className="ml-auto w-40">
+
+        <div className="ml-auto w-36 sm:w-44">
           <Input size="sm" type="search" placeholder="Search here...">
             <Input.Icon>
               <Search className="h-full w-full" />
             </Input.Icon>
           </Input>
         </div>
-        {
-            (userInfo == null) && 
-            <Link to='/login' className="hidden lg:ml-auto lg:inline-block">
-                <Button size="sm">Sign In</Button>
+
+        <button
+          onClick={toggleTheme}
+          aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          className="rounded-lg p-2 transition hover:bg-gray-100 dark:hover:bg-slate-800"
+        >
+          {darkMode ? (
+            <Sun className="text-yellow-400" size={21} />
+          ) : (
+            <Moon className="text-slate-700" size={21} />
+          )}
+        </button>
+
+        <div className="hidden items-center gap-2 lg:flex">
+          {userInfo ? (
+            <Link to="/dashboard">
+              <Button size="sm">Open Dashboard</Button>
             </Link>
-        }
+          ) : (
+            <>
+              <Link to="/login">
+                <Button size="sm" variant="ghost">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm">Get Started</Button>
+              </Link>
+            </>
+          )}
+        </div>
+
         <IconButton
           size="sm"
           variant="ghost"
           color="secondary"
-          onClick={() => setOpenNav(!openNav)}
-          className="ml-auto grid lg:hidden"
+          onClick={() => setOpenNav((value) => !value)}
+          className="grid lg:hidden"
+          aria-label={openNav ? "Close navigation" : "Open navigation"}
         >
           {openNav ? (
             <Xmark className="h-4 w-4" />
@@ -164,29 +151,33 @@ export default function SimpleNavbar() {
             <MenuIcon className="h-4 w-4" />
           )}
         </IconButton>
-        <button
-        onClick={toggleTheme}
-        className="
-          p-2 lg:ml-2
-          rounded-lg
-          hover:bg-gray-100
-          dark:hover:bg-slate-800
-          transition
-        "
-      >
-        {darkMode ? (
-          <Sun className="text-yellow-400" size={22} />
-        ) : (
-          <Moon className="text-slate-700" size={22} />
-        )}
-      </button>
-        {userInfo && <ProfileMenu />}
       </div>
+
       <Collapse open={openNav}>
-        <NavList />
-        <Link to="/login">
-            <Button isFullWidth size="sm" className="mt-4">Sign In</Button>
-        </Link>
+        <NavList mobile onNavigate={closeMobileNav} />
+
+        <div className="mt-4 flex flex-col gap-2 pb-2">
+          {userInfo ? (
+            <Link to="/dashboard" onClick={closeMobileNav}>
+              <Button isFullWidth size="sm">
+                Open Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" onClick={closeMobileNav}>
+                <Button isFullWidth size="sm" variant="ghost">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/register" onClick={closeMobileNav}>
+                <Button isFullWidth size="sm">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
       </Collapse>
     </Navbar>
   );
