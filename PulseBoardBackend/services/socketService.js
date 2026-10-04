@@ -33,8 +33,11 @@ export const initializeSocketServer = (httpServer, allowedOrigins) => {
     }
 
     try {
-      const user = await User.findById(decoded.id).select("sessions").lean();
-      const session = user?.sessions?.find((item) => item.sid === decoded.sid);
+      const user = await User.findById(decoded.id).select("role status sessions").lean();
+      if (!user || user.status === "Inactive" || user.role !== decoded.role) {
+        return next(new Error("Invalid or expired session"));
+      }
+      const session = user.sessions?.find((item) => item.sid === decoded.sid);
       const expiresAt = session ? new Date(session.expiresAt).getTime() : NaN;
       if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
         return next(new Error("Invalid or expired session"));
@@ -42,7 +45,7 @@ export const initializeSocketServer = (httpServer, allowedOrigins) => {
 
       socket.user = {
         id: String(decoded.id),
-        role: decoded.role,
+        role: user.role,
         sid: String(decoded.sid),
       };
       return next();
@@ -61,6 +64,17 @@ export const initializeSocketServer = (httpServer, allowedOrigins) => {
   return socketServer;
 };
 
+
+export const disconnectUserSockets = (userId, sessionIds) => {
+  if (!socketServer) return;
+  const userIdString = String(userId);
+  const sessionsToDisconnect = sessionIds ? new Set(sessionIds.map(String)) : null;
+  for (const socket of socketServer.sockets.sockets.values()) {
+    if (socket.user?.id !== userIdString) continue;
+    if (sessionsToDisconnect && !sessionsToDisconnect.has(socket.user.sid)) continue;
+    socket.disconnect(true);
+  }
+};
 export const getSocketServer = () => {
   if (!socketServer) {
     throw new Error("Socket.IO server has not been initialized");

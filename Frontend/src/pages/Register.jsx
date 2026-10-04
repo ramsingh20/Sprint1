@@ -36,8 +36,8 @@ export default function Register() {
       );
 
       const data = await response.json();
-      console.log("data", data);
-      console.log("data user", data.user);    // chatGPT was right
+      // console.log("data", data);
+      // console.log("data user", data.user);    // chatGPT was right
 
       if (!response.ok) {
         throw new Error(data.message || "Registration failed");

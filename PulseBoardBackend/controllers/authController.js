@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "node:crypto";
+import { disconnectUserSockets } from "../services/socketService.js";
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -328,6 +329,7 @@ export const revokeSession = async (req, res) => {
     if (!sessionExists) return res.status(404).json({ message: "Session not found" });
     user.sessions = user.sessions.filter((session) => session.sid !== req.params.sid);
     await user.save();
+    disconnectUserSockets(user._id, [req.params.sid]);
     return res.status(200).json({ message: "Session signed out successfully" });
   } catch (error) {
     console.error("Revoke session error:", error);
@@ -339,8 +341,10 @@ export const revokeOtherSessions = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
+    const revokedSessionIds = user.sessions.filter((session) => session.sid !== req.user.sid).map((session) => session.sid);
     user.sessions = user.sessions.filter((session) => session.sid === req.user.sid);
     await user.save();
+    disconnectUserSockets(user._id, revokedSessionIds);
     return res.status(200).json({ message: "Other sessions signed out successfully" });
   } catch (error) {
     console.error("Revoke other sessions error:", error);
@@ -351,6 +355,7 @@ export const revokeOtherSessions = async (req, res) => {
 export const logoutCurrentSession = async (req, res) => {
   try {
     await User.updateOne({ _id: req.user.id }, { $pull: { sessions: { sid: req.user.sid } } });
+    disconnectUserSockets(req.user.id, [req.user.sid]);
     return res.status(200).json({ message: "Signed out successfully" });
   } catch (error) {
     console.error("Logout error:", error);
@@ -413,10 +418,12 @@ export const changePassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
     // 7. Save new password and revoke other active sessions
+    const revokedSessionIds = user.sessions.filter((session) => session.sid !== req.user.sid).map((session) => session.sid);
     user.password = hashedPassword;
     user.sessions = user.sessions.filter((session) => session.sid === req.user.sid);
 
     await user.save();
+    disconnectUserSockets(user._id, revokedSessionIds);
 
     return res.status(200).json({
       message: "Password changed successfully",

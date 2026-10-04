@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch()
 
@@ -40,15 +40,15 @@ export default function Login() {
 
             const data = await response.json()
 
-            console.log("data", data);
-            console.log("data Ruser", data.Ruser);
+            // console.log("data", data);
+            // console.log("data Ruser", data.Ruser);
             // console.log("data user.name", data.user.name);
             if (!response.ok) {
               throw new Error(data.message || "Login failed");
             }
             localStorage.setItem("token", data.token);      // Store JWT
             connectSocket();
-            
+
             dispatch(setUser(data.Ruser))   // Store user information
             // navigate('/dashboard')
             const from = location.state?.from?.pathname || "/dashboard";    // Redirect user

@@ -21,9 +21,12 @@ export const protect = async (req, res, next) => {
 
   try {
     const user = await User.findOne({ _id: decoded.id, "sessions.sid": decoded.sid })
-      .select("sessions")
+      .select("role status sessions")
       .lean();
-    const session = user?.sessions?.find((item) => item.sid === decoded.sid);
+    if (!user || user.status === "Inactive" || user.role !== decoded.role) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+    const session = user.sessions?.find((item) => item.sid === decoded.sid);
     if (!session) return res.status(401).json({ message: "Invalid or expired token" });
 
     const lastActiveAt = new Date(session.lastActiveAt).getTime();

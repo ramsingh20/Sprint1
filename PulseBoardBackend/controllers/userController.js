@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import { disconnectUserSockets } from "../services/socketService.js";
 
 export const getUsers = async (req, res) => {
   try {
@@ -90,6 +91,8 @@ export const updateUser = async (req, res) => {
       existingUser.email = normalizedEmail;
     }
 
+    let roleChanged = false;
+
     // Only Admin can change roles
     if (role !== undefined) {
       if (req.user.role !== "Admin") {
@@ -106,10 +109,13 @@ export const updateUser = async (req, res) => {
         });
       }
 
+      roleChanged = existingUser.role !== role;
       existingUser.role = role;
     }
 
+    if (roleChanged) existingUser.sessions = [];
     const updatedUser = await existingUser.save();
+    if (roleChanged) disconnectUserSockets(updatedUser._id);
 
     return res.status(200).json({
       message: "User updated successfully",
@@ -154,8 +160,10 @@ export const updateUserStatus = async (req, res) => {
 
     // Update status
     user.status = status;
+    if (status === "Inactive") user.sessions = [];
 
     const updatedUser = await user.save();
+    if (status === "Inactive") disconnectUserSockets(updatedUser._id);
 
     return res.status(200).json({
       message: `User ${status.toLowerCase()} successfully`,
